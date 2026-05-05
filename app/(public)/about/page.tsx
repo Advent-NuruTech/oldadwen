@@ -204,7 +204,7 @@ export default function AboutPage() {
           <p className="text-blue-200 text-lg mb-2">Restoring Old Adventism</p>
           <div className="h-0.5 w-16 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto my-4"></div>
           <p className="text-blue-300 mb-1">📍 Headquarters: Rongo, Migori County, Kenya</p>
-          <p className="text-blue-300 mb-6">📧 Contact: [Insert Email / Phone / P.O. Box]</p>
+          <p className="text-blue-300 mb-6">📧 Contact: oldsdaorganization@gmail.com</p>
           <div className="bg-blue-950/30 border-l-4 border-cyan-400 p-5 max-w-2xl mx-auto rounded-r-xl">
             <p className="text-cyan-200 italic text-lg">
               “Thus saith the Lord, Stand ye in the ways, and see, and ask for the old paths, where is the good way, and walk therein, and ye shall find rest for your souls.”

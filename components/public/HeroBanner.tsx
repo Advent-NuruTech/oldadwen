@@ -6,14 +6,13 @@ import Link from "next/link";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 
-/* ================= TYPES ================= */
 interface Video {
   id: string;
   videoId: string;
 }
 
-/* ================= TYPING HOOK ================= */
-function useTyping(text: string, speed = 100, repeatDelay = 2000) {
+/* Typing hook unchanged */
+function useTyping(text: string, speed = 90, repeatDelay = 2000) {
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
@@ -43,19 +42,13 @@ function useTyping(text: string, speed = 100, repeatDelay = 2000) {
   return displayed;
 }
 
-/* ================= HERO ================= */
 export default function HeroBanner() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const typingText = useTyping(
-    "Prepare to meet the LORD thy God",
-    90,
-    2000
-  );
+  const typingText = useTyping("Prepare to meet the LORD thy God");
 
-  /* ===== Fetch latest 5 videos ===== */
   useEffect(() => {
     const fetchVideos = async () => {
       const q = query(
@@ -66,24 +59,23 @@ export default function HeroBanner() {
 
       const snapshot = await getDocs(q);
 
-      const vids: Video[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        videoId: doc.data().videoId,
-      }));
-
-      setVideos(vids);
+      setVideos(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          videoId: doc.data().videoId,
+        }))
+      );
     };
 
     fetchVideos();
   }, []);
 
-  /* ===== Auto slide every 5s ===== */
   useEffect(() => {
-    if (videos.length === 0) return;
+    if (!videos.length) return;
 
     intervalRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % videos.length);
-    }, 5000);
+      setCurrent((p) => (p + 1) % videos.length);
+    }, 600000); // 🔥 10 minutes rotation
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -91,87 +83,71 @@ export default function HeroBanner() {
   }, [videos]);
 
   return (
-    <motion.section
-      className="relative w-full h-screen overflow-hidden flex items-center justify-center bg-black"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-    >
-      {/* ===== BACKGROUND VIDEO SLIDER ===== */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
-        <AnimatePresence mode="wait">
-          {videos.length > 0 && (
-            <motion.iframe
-              key={videos[current].videoId}
-              src={`https://www.youtube.com/embed/${videos[current].videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${videos[current].videoId}&modestbranding=1`}
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-110"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              initial={{ x: 300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ duration: 1 }}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* ===== DARK OVERLAY ===== */}
+    <section className="relative w-full min-h-screen bg-black overflow-hidden flex items-center">
+      {/* BACKGROUND LAYER */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-blue-950/70 to-black/90 z-10" />
 
-      {/* ===== CONTENT ===== */}
-      <div className="relative z-20 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 lg:px-8">
+        
+        {/* GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
-          {/* TEXT */}
-          <div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
+          {/* TEXT SIDE */}
+          <div className="flex flex-col justify-center pt-4 lg:pt-0">
+            <motion.h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight">
               Old Seventh Day{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
                 Adventists
               </span>
-            </h1>
+            </motion.h1>
 
-            <h2 className="mt-4 text-xl sm:text-2xl text-blue-100">
+            <h2 className="mt-3 text-lg sm:text-2xl font-semibold text-blue-100">
               Restoring all things
             </h2>
 
-            <div className="mt-6 text-lg sm:text-xl text-blue-100 min-h-[40px]">
+            <div className="mt-4 text-blue-100 text-base sm:text-lg font-medium min-h-[32px]">
               {typingText}
               <span className="animate-pulse ml-1">|</span>
             </div>
 
-            {/* CTA */}
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/sabbath-school"
-                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
-              >
+            {/* CTAs */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link className="bg-blue-600 px-5 py-3 rounded-lg text-white font-semibold" href="/sabbath-school">
                 Sabbath School
               </Link>
 
-              <Link
-                href="/library"
-                className="border border-blue-400 text-blue-100 px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition"
-              >
+              <Link className="border border-blue-400 px-5 py-3 rounded-lg text-blue-100 font-semibold" href="/library">
                 Bible Studies
               </Link>
 
-              <Link
-                href="/calendar"
-                className="border border-cyan-300 text-cyan-100 px-6 py-3 rounded-lg font-semibold hover:bg-cyan-400 hover:text-black transition"
-              >
+              <Link className="border border-cyan-300 px-5 py-3 rounded-lg text-cyan-100 font-semibold" href="/calendar">
                 Calendar
               </Link>
             </div>
           </div>
 
-          {/* VISUAL EFFECT */}
-          <div className="hidden lg:flex justify-center">
-            <div className="relative w-72 h-72">
-              <div className="absolute inset-0 rounded-full border border-blue-400/30 animate-pulse" />
-              <div className="absolute inset-6 rounded-full border border-cyan-300/20 animate-spin" />
-              <div className="absolute inset-12 rounded-full bg-blue-500/10 blur-2xl" />
+          {/* VIDEO SIDE */}
+          <div className="w-full flex justify-center lg:justify-end mt-6 lg:mt-0">
+            <div className="relative w-full max-w-xl aspect-video rounded-xl overflow-hidden shadow-2xl">
+
+              <AnimatePresence mode="wait">
+                {videos.length > 0 && (
+                  <motion.iframe
+                    key={videos[current].videoId}
+                    src={`https://www.youtube.com/embed/${videos[current].videoId}?autoplay=1&mute=1&controls=0&rel=0&loop=1&playlist=${videos[current].videoId}`}
+                    className="absolute inset-0 w-full h-full"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1 }}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* subtle overlay */}
+              <div className="absolute inset-0 bg-black/20" />
             </div>
           </div>
 
@@ -184,6 +160,6 @@ export default function HeroBanner() {
           <div className="w-1 h-2 bg-white rounded-full animate-bounce" />
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
