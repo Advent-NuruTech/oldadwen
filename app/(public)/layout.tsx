@@ -10,7 +10,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     <div
       className="min-h-[100svh] flex flex-col text-gray-900 relative bg-cover bg-center bg-fixed"
       style={{
-        backgroundImage: "url('/images/nature2.jpg')",
+        backgroundImage: "url('https://res.cloudinary.com/dg7jxs7st/image/upload/v1777989749/nature1_pwxrui.jpg')",
       }}
     >
       {/* Soft overlay for readability */}

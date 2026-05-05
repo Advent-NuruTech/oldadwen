@@ -112,15 +112,15 @@ export default function HeroBanner() {
 
             {/* CTAs */}
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link className="bg-blue-600 px-5 py-3 rounded-lg text-white font-semibold" href="/sabbath-school">
+              <Link className="bg-[#2563EB] px-5 py-3 rounded-lg text-white font-semibold hover:bg-[#1D4ED8] transition-colors" href="/sabbath-school">
                 Sabbath School
               </Link>
 
-              <Link className="border border-blue-400 px-5 py-3 rounded-lg text-blue-100 font-semibold" href="/library">
+              <Link className="border border-blue-400 px-5 py-3 rounded-lg text-blue-100 font-semibold hover:bg-blue-400/10 transition-colors" href="/library">
                 Bible Studies
               </Link>
 
-              <Link className="border border-cyan-300 px-5 py-3 rounded-lg text-cyan-100 font-semibold" href="/calendar">
+              <Link className="border border-cyan-300 px-5 py-3 rounded-lg text-cyan-100 font-semibold hover:bg-cyan-300/10 transition-colors" href="/calendar">
                 Calendar
               </Link>
             </div>

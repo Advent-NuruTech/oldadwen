@@ -10,6 +10,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { parseDateOnly, toYmd } from "@/lib/dateUtils";
 import { buildExportLines, buildPdfBlob, ChurchEvent } from "@/lib/eventEngine";
 
+/* ================= HELPERS ================= */
 function buildDateIndex(events: ChurchEvent[]): Map<string, ChurchEvent[]> {
   const index = new Map<string, ChurchEvent[]>();
 
@@ -22,11 +23,7 @@ function buildDateIndex(events: ChurchEvent[]): Map<string, ChurchEvent[]> {
     while (cursor <= end) {
       const key = toYmd(cursor);
       const existing = index.get(key);
-      if (existing) {
-        existing.push(event);
-      } else {
-        index.set(key, [event]);
-      }
+      existing ? existing.push(event) : index.set(key, [event]);
       cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 1);
     }
   });
@@ -38,22 +35,20 @@ function intersectsRange(event: ChurchEvent, rangeStart: Date, rangeEnd: Date): 
   const start = parseDateOnly(event.startDate);
   const end = parseDateOnly(event.endDate);
   if (!start || !end) return false;
-
   return start <= rangeEnd && end >= rangeStart;
 }
 
 function triggerPdfDownload(lines: string[], fileName: string): void {
   const blob = buildPdfBlob(lines);
   const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = fileName;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
   URL.revokeObjectURL(url);
 }
 
+/* ================= PAGE ================= */
 export default function CalendarPage() {
   const { events, loading, error } = useEvents();
 
@@ -69,187 +64,196 @@ export default function CalendarPage() {
   }, [eventDateIndex, selectedDate]);
 
   const onDateChange = (value: Date | Date[] | null) => {
-    if (value instanceof Date) {
-      setSelectedDate(value);
-      return;
-    }
-
-    if (Array.isArray(value) && value[0] instanceof Date) {
-      setSelectedDate(value[0]);
-    }
-  };
-
-  const exportYearly = () => {
-    const rangeStart = new Date(yearForExport, 0, 1);
-    const rangeEnd = new Date(yearForExport, 11, 31);
-
-    const filtered = events.filter((event) => intersectsRange(event, rangeStart, rangeEnd));
-    const lines = buildExportLines(filtered, `Church Calendar ${yearForExport}`);
-    triggerPdfDownload(lines, `church-calendar-${yearForExport}.pdf`);
+    if (value instanceof Date) setSelectedDate(value);
+    else if (Array.isArray(value) && value[0]) setSelectedDate(value[0]);
   };
 
   const exportMonthly = () => {
-    const rangeStart = new Date(yearForExport, monthForExport - 1, 1);
-    const rangeEnd = new Date(yearForExport, monthForExport, 0);
+    const start = new Date(yearForExport, monthForExport - 1, 1);
+    const end = new Date(yearForExport, monthForExport, 0);
 
-    const filtered = events.filter((event) => intersectsRange(event, rangeStart, rangeEnd));
-    const monthLabel = rangeStart.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    const filtered = events.filter((e) => intersectsRange(e, start, end));
+    const label = start.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
-    const lines = buildExportLines(filtered, `Church Calendar ${monthLabel}`);
-    triggerPdfDownload(lines, `church-calendar-${yearForExport}-${String(monthForExport).padStart(2, "0")}.pdf`);
+    triggerPdfDownload(buildExportLines(filtered, label), `calendar-${label}.pdf`);
+  };
+
+  const exportYearly = () => {
+    const start = new Date(yearForExport, 0, 1);
+    const end = new Date(yearForExport, 11, 31);
+
+    const filtered = events.filter((e) => intersectsRange(e, start, end));
+    triggerPdfDownload(
+      buildExportLines(filtered, `Year ${yearForExport}`),
+      `calendar-${yearForExport}.pdf`
+    );
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-3xl bg-white p-6 shadow-sm">
-          <h1 className="text-3xl font-bold">Old SDA  Church Calendar Of Events </h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Real-time events, smart announcements, and church-ready exports.
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white px-4 pt-24 pb-10">
+      
+      <div className="mx-auto max-w-7xl space-y-10">
+
+        {/* HEADER */}
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight">
+            Old SDA <span className="text-cyan-400">Church Calendar</span>
+          </h1>
+          <p className="text-slate-300 text-sm">
+            Events, schedules & spiritual gatherings in one place
           </p>
+        </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr,320px]">
-            <div className="rounded-2xl border border-slate-200 p-4">
-              <Calendar
-                onChange={onDateChange as any}
-                value={selectedDate}
-                tileClassName={({ date, view }) => {
-                  if (view !== "month") return undefined;
-                  const hasEvents = (eventDateIndex.get(toYmd(date)) ?? []).length > 0;
-                  return hasEvents ? "calendar-has-events" : undefined;
-                }}
-                tileContent={({ date, view }) => {
-                  if (view !== "month") return null;
-                  const dayEvents = eventDateIndex.get(toYmd(date)) ?? [];
-                  if (dayEvents.length === 0) return null;
+        {/* MAIN GRID */}
+        <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-8">
 
-                  const title = dayEvents.map((event) => event.title).join(" | ");
-                  return (
-                    <div title={title} className="calendar-marker-row">
-                      {dayEvents.slice(0, 3).map((event) => (
-                        <span key={`${event.id}-${event.startDate}`} className="calendar-marker" />
-                      ))}
-                      {dayEvents.length > 3 ? <span className="calendar-plus">+{dayEvents.length - 3}</span> : null}
-                    </div>
-                  );
-                }}
-              />
-            </div>
- <section className="space-y-4">
-          <h2 className="text-2xl font-bold">
-            Events on {selectedDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-          </h2>
+          {/* CALENDAR CARD */}
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
 
-          {loading && <p className="text-sm text-slate-600">Loading events...</p>}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            <Calendar
+              onChange={onDateChange as any}
+              value={selectedDate}
+              calendarType="gregory"
+              locale="en-US"
+              className="modern-calendar"
+              tileClassName={({ date, view }) => {
+                if (view !== "month") return undefined;
+                return (eventDateIndex.get(toYmd(date))?.length ?? 0) > 0
+                  ? "has-event"
+                  : undefined;
+              }}
+              tileContent={({ date, view }) => {
+                if (view !== "month") return null;
+                const events = eventDateIndex.get(toYmd(date)) ?? [];
+                if (!events.length) return null;
 
-          {!loading && !error && selectedEvents.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
-              No events scheduled for this date.
-            </div>
-          )}
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {selectedEvents.map((event) => (
-              <EventCard key={event.id} event={event} onOpen={setActiveModalEvent} detailsHref={`/events/${event.id}`} />
-            ))}
+                return (
+                  <div className="flex justify-center gap-1 mt-1">
+                    {events.slice(0, 2).map((e) => (
+                      <span key={e.id} className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                    ))}
+                    {events.length > 2 && (
+                      <span className="text-[10px] text-cyan-300">
+                        +{events.length - 2}
+                      </span>
+                    )}
+                  </div>
+                );
+              }}
+            />
           </div>
-        </section>
-            <aside className="space-y-4 rounded-2xl border border-slate-200 p-4">
-              <h2 className="text-lg font-semibold">PDF Export</h2>
-              <p className="text-sm text-slate-600">Download yearly or monthly calendar in a church-ready format.</p>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">Year</label>
+          {/* SIDE PANEL */}
+          <div className="space-y-6">
+
+            {/* EVENTS LIST */}
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5">
+              <h2 className="text-lg font-semibold mb-3">
+                {selectedDate.toDateString()}
+              </h2>
+
+              {loading && <p className="text-sm text-slate-400">Loading...</p>}
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+
+              {!loading && selectedEvents.length === 0 && (
+                <p className="text-sm text-slate-400">No events scheduled</p>
+              )}
+
+              <div className="space-y-3">
+                {selectedEvents.map((e) => (
+                  <EventCard
+                    key={e.id}
+                    event={e}
+                    onOpen={setActiveModalEvent}
+                    detailsHref={`/events/${e.id}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* EXPORT PANEL */}
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5">
+              <h2 className="text-lg font-semibold text-cyan-300">
+                Export Center
+              </h2>
+
+              <div className="mt-4 space-y-3">
                 <input
                   type="number"
                   value={yearForExport}
-                  onChange={(event) => setYearForExport(Number(event.target.value) || new Date().getFullYear())}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  onChange={(e) => setYearForExport(Number(e.target.value))}
+                  className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm"
                 />
-              </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">Month</label>
                 <select
                   value={monthForExport}
-                  onChange={(event) => setMonthForExport(Number(event.target.value))}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  onChange={(e) => setMonthForExport(Number(e.target.value))}
+                  className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm"
                 >
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <option key={index + 1} value={index + 1}>
-                      {new Date(2000, index, 1).toLocaleString("en-US", { month: "long" })}
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {new Date(0, i).toLocaleString("en", { month: "long" })}
                     </option>
                   ))}
                 </select>
-              </div>
 
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={exportYearly}
-                  className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700"
-                >
-                  Export Year PDF
+                <button onClick={exportMonthly} className="btn-primary">
+                  Export Month
                 </button>
-                <button
-                  type="button"
-                  onClick={exportMonthly}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100"
-                >
-                  Export Month PDF
+
+                <button onClick={exportYearly} className="btn-secondary">
+                  Export Year
                 </button>
               </div>
-            </aside>
+            </div>
+
           </div>
-        </section>
-
-        
+        </div>
       </div>
 
-      <EventModal event={activeModalEvent} onClose={() => setActiveModalEvent(null)} />
+      <EventModal
+        event={activeModalEvent}
+        onClose={() => setActiveModalEvent(null)}
+      />
 
+      {/* STYLES */}
       <style jsx global>{`
-        .react-calendar {
+        .modern-calendar {
           width: 100%;
           border: none;
-          font-family: inherit;
+          background: transparent;
+          color: white;
         }
 
         .react-calendar__tile {
-          border-radius: 0.75rem;
-          position: relative;
+          border-radius: 10px;
+          padding: 10px 0;
         }
 
         .react-calendar__tile--active {
-          background: #0f172a !important;
-          color: #fff;
+          background: linear-gradient(135deg, #06b6d4, #3b82f6) !important;
+          color: white;
         }
 
-        .calendar-has-events {
-          background: #eff6ff;
+        .has-event {
+          background: rgba(34, 211, 238, 0.08);
         }
 
-        .calendar-marker-row {
-          margin-top: 2px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 2px;
+        .btn-primary {
+          width: 100%;
+          padding: 10px;
+          background: linear-gradient(135deg, #06b6d4, #3b82f6);
+          border-radius: 10px;
+          font-weight: 600;
+          color: white;
         }
 
-        .calendar-marker {
-          width: 6px;
-          height: 6px;
-          border-radius: 999px;
-          background: #2563eb;
-          display: inline-block;
-        }
-
-        .calendar-plus {
-          font-size: 9px;
-          color: #1d4ed8;
-          font-weight: 700;
+        .btn-secondary {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 10px;
+          color: white;
         }
       `}</style>
     </div>
