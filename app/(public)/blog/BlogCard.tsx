@@ -8,9 +8,10 @@ export type Blog = {
   content: string;
   imageURL?: string;
   author: string;
-  createdAt?: any; // Firestore Timestamp / Date / string
+  createdAt?: any;
 };
 
+// ---------- UTILS ----------
 function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, "").trim();
 }
@@ -52,41 +53,54 @@ export default function BlogCard({ blog, onReadMore }: BlogCardProps) {
   const needsReadMore = wordCount > 60;
 
   return (
-    <article className="mb-10 border-b pb-6">
-      <h2 className="text-xl font-bold mb-1 text-gray-900 dark:text-gray-100">
-        {blog.title}
-      </h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-        By <span className="font-medium">{blog.author}</span>
-      </p>
+    <article className="mb-10">
+      <div className="bg-white dark:bg-[#2A221C] border border-gray-200 dark:border-[#3A2F25] rounded-2xl shadow-md hover:shadow-xl transition p-5">
 
-      {blog.imageURL && (
-        <img
-          src={blog.imageURL}
-          alt={blog.title}
-          className="w-full h-auto object-contain rounded-lg mb-4"
-          loading="lazy"
-        />
-      )}
+        {/* IMAGE */}
+        {blog.imageURL && (
+          <img
+            src={blog.imageURL}
+            alt={blog.title}
+            className="w-full h-52 object-cover rounded-xl mb-4"
+            loading="lazy"
+          />
+        )}
 
-      <div className="prose max-w-none dark:prose-invert">
-        <p>{getPreview(blog.content)}</p>
-      </div>
+        {/* TITLE */}
+        <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-900 dark:text-[#F6F1EA] leading-snug">
+          {blog.title}
+        </h2>
 
-      {needsReadMore && (
-        <button
-          onClick={() => onReadMore(blog.id)}
-          className="mt-3 text-blue-600 dark:text-blue-400 font-medium hover:underline"
-        >
-          Read more
-        </button>
-      )}
-
-      {blog.createdAt && (
-        <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
-          Published on {formatDate(blog.createdAt)}
+        {/* AUTHOR */}
+        <p className="text-sm mb-2 text-[#6B4A2E] dark:text-[#D9A441] font-medium">
+          By {blog.author}
         </p>
-      )}
+
+        {/* DATE */}
+        {blog.createdAt && (
+          <p className="text-xs mb-3 text-[#A67C52] dark:text-[#C9A46C]">
+            {formatDate(blog.createdAt)}
+          </p>
+        )}
+
+        {/* PREVIEW */}
+        <p className="text-gray-700 dark:text-[#D8C9B4] leading-relaxed text-sm md:text-base">
+          {getPreview(blog.content)}
+        </p>
+
+        {/* ACTION */}
+        {needsReadMore && (
+          <button
+            onClick={() => onReadMore(blog.id)}
+            className="mt-4 inline-block px-5 py-2 rounded-full font-semibold
+              bg-gradient-to-r from-[#6B4A2E] to-[#D9A441]
+              text-white dark:text-black
+              hover:opacity-90 transition"
+          >
+            Read More
+          </button>
+        )}
+      </div>
     </article>
   );
 }

@@ -469,10 +469,10 @@ export default function Footer() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="text-center lg:text-left">
               <p className="text-gray-700 dark:text-gray-300">
-                © {year} Gospel Sounders Publications & Missions. All rights reserved.
+                © {year} old sda. All rights reserved.
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Revealing the Father and the Son.
+               Restoring the Old Adventism
               </p>
             </div>
 

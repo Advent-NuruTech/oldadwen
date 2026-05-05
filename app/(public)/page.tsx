@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-/* ================= IMPORT COMPONENTS ================= */
+/* ================= COMPONENTS ================= */
 import Hero from "@/components/public/HeroBanner";
 import BlogList from "@/components/public/BlogList";
 import LibraryList from "@/components/public/LibraryList";
@@ -12,142 +12,163 @@ import YoutubeCarousel from "@/components/public/YoutubeCarousel";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-white text-gray-900">
+    <main className="min-h-screen bg-white text-[#0F172A]">
 
       {/* ================= HERO ================= */}
       <Hero />
 
-      {/* ================= YOUTUBE (DARK SECTION) ================= */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 
-        bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 
-        text-white">
-        
-        <div className="max-w-7xl mx-auto text-center">
+      {/* ================= YOUTUBE ================= */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#0F172A] text-white">
+
+        <div className="max-w-6xl mx-auto text-center">
+
           <SectionTitle
             title="Latest Video Messages"
-            subtitle="Watch powerful sermons, Bible teachings, and mission highlights"
+            subtitle="Watch sermons, teachings, and mission highlights"
+            variant="dark"
+            
           />
 
           <motion.div
-            className="mt-12"
+            className="mt-10"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
             <YoutubeCarousel />
           </motion.div>
 
-          <motion.div
-            className="mt-12"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-          >
+          <div className="mt-10">
             <a
               href="https://youtube.com/@gospelsounders"
               target="_blank"
-              className="inline-block
-                bg-white text-blue-900
-                px-8 py-4
-                rounded-xl font-bold text-lg
-                hover:bg-gray-100 hover:scale-105
-                transition-all duration-300 shadow-lg"
+              className="
+                inline-block
+                bg-white text-[#0F172A]
+                px-6 py-3 rounded-lg font-semibold
+                hover:bg-gray-100 transition
+              "
             >
               WATCH ALL VIDEOS →
             </a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ================= BLOG & LIBRARY ================= */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-          {/* BLOG */}
-          <div>
-            <SectionTitle
-              title="Ministry Updates"
-              subtitle="Latest messages, reflections, and announcements"
-            />
-
-            <div className="mt-10">
-              <BlogList maxBlogs={4} />
-            </div>
-
-            <div className="mt-10 text-center">
-              <Link
-                href="/blog"
-                className="inline-block
-                  border-2 border-blue-700 text-blue-700
-                  px-8 py-3 rounded-lg font-semibold
-                  hover:bg-blue-700 hover:text-white
-                  transition-all duration-300"
-              >
-                READ MORE →
-              </Link>
-            </div>
-          </div>
-
-          {/* LIBRARY */}
-          <div>
-            <SectionTitle
-              title="Bible Study Library"
-              subtitle="Deep studies, downloadable materials, and references"
-            />
-
-            <div className="mt-10">
-              <LibraryList maxDocs={4} />
-            </div>
-
-            <div className="mt-10 text-center">
-              <Link
-                href="/library"
-                className="inline-block
-                  bg-blue-700 text-white
-                  px-8 py-3 rounded-lg font-semibold
-                  hover:bg-blue-800 hover:scale-105
-                  transition-all duration-300 shadow-md"
-              >
-                EXPLORE LIBRARY →
-              </Link>
-            </div>
           </div>
 
         </div>
       </section>
 
-      {/* ================= CALL TO ACTION ================= */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 
-        bg-gray-50 border-t border-gray-200">
-        
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-            Grow in Truth. Stand in Faith.
-          </h2>
+      {/* ================= BLOG (FULL WIDTH SECTION) ================= */}
+      <section className="py-14 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC]">
 
-          <p className="mt-4 text-gray-600 text-lg">
-            Access Bible studies, sermons, and materials to strengthen your walk with God.
-          </p>
+        <div className="max-w-6xl mx-auto">
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <SectionTitle
+            title="Ministry Updates"
+            subtitle="Latest messages, reflections, and announcements"
+          />
+
+          <div className="mt-8">
+            <BlogList maxBlogs={6} />
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/blog"
+              className="
+                inline-block
+                border border-[#2563EB] text-[#2563EB]
+                px-6 py-2.5 rounded-lg font-semibold
+                hover:bg-[#2563EB] hover:text-white
+                transition
+              "
+            >
+              READ MORE →
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= LIBRARY (STACKED BELOW BLOG) ================= */}
+      <section className="py-14 px-4 sm:px-6 lg:px-8 bg-white">
+
+        <div className="max-w-6xl mx-auto">
+
+          <SectionTitle
+            title="Bible Study Library"
+            subtitle="Deep studies, downloadable materials, and references"
+          />
+
+          <div className="mt-8">
+            <LibraryList maxDocs={6} />
+          </div>
+
+          <div className="mt-8 text-center">
             <Link
               href="/library"
-              className="bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold
-              hover:bg-blue-800 transition-all"
+              className="
+                inline-block
+                bg-[#2563EB] text-white
+                px-6 py-2.5 rounded-lg font-semibold
+                hover:bg-[#1D4ED8]
+                transition
+              "
             >
-              START STUDY
-            </Link>
-
-            <Link
-              href="/contact"
-              className="border border-gray-400 px-8 py-3 rounded-lg font-semibold
-              hover:bg-gray-100 transition-all"
-            >
-              CONTACT US
+              EXPLORE LIBRARY →
             </Link>
           </div>
+
         </div>
       </section>
 
+      {/* ================= CTA ================= */}
+<section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#020617] border-t border-blue-500/10">
+
+  <div className="max-w-4xl mx-auto text-center">
+
+    {/* Card Container (matches Library cards theme) */}
+    <div className="bg-white/5 border border-blue-500/20 backdrop-blur-md rounded-2xl p-10 md:p-14 shadow-xl">
+
+      <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+        Grow in Truth. Stand in Faith.
+      </h2>
+
+      <p className="mt-4 text-blue-100 text-lg leading-relaxed max-w-2xl mx-auto">
+        Access Bible studies, sermons, and materials for spiritual growth.
+      </p>
+
+      {/* Buttons */}
+      <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+
+        <Link
+          href="/library"
+          className="
+            bg-gradient-to-r from-blue-600 to-indigo-600
+            text-white px-8 py-3 rounded-xl font-semibold
+            hover:from-cyan-500 hover:to-blue-600
+            transition-all shadow-md
+          "
+        >
+          START STUDY
+        </Link>
+
+        <Link
+          href="/contact"
+          className="
+            border border-blue-400/30 text-blue-100
+            px-8 py-3 rounded-xl font-semibold
+            hover:bg-white/10 hover:text-white
+            transition
+          "
+        >
+          CONTACT US
+        </Link>
+
+      </div>
+
+    </div>
+  </div>
+
+</section>
     </main>
   );
 }

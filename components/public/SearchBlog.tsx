@@ -51,157 +51,123 @@ export default function SearchBlog({
     setSearchType("text");
   };
 
-  const hasActiveFilters = 
-    filters.searchTerm || 
-    filters.authorFilter !== "all" || 
+  const hasActiveFilters =
+    filters.searchTerm ||
+    filters.authorFilter !== "all" ||
     filters.dateFilter;
 
   return (
-    <div className="sticky top-4 z-10 mb-8">
-      {/* Search Toggle Button */}
-      <div className="flex justify-center mb-4">
+    <div className="sticky top-4 z-10 mb-10">
+      
+      {/* BUTTON */}
+      <div className="flex justify-center mb-5">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+          className={`flex items-center gap-3 px-6 py-3 rounded-full font-semibold transition shadow ${
             isSearching || hasActiveFilters
-              ? "bg-gradient-to-r from-[#6B4A2E] to-[#D9A441] text-white dark:text-black"
-              : "bg-white dark:bg-[#2A221C] text-gray-900 dark:text-[#F6F1EA] border border-gray-300 dark:border-[#6B4A2E]"
+              ? "bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white"
+              : "bg-white text-gray-800 border border-gray-200 hover:bg-gray-100"
           }`}
         >
           {isSearching || hasActiveFilters ? (
             <>
-              <Filter size={20} />
+              <Filter size={18} />
               <span>Search Active</span>
-              <span className="ml-1 bg-white dark:bg-black text-[#6B4A2E] dark:text-[#D9A441] px-2 py-0.5 rounded-full text-xs">
+              <span className="ml-1 bg-white text-[#1D4ED8] px-2 py-0.5 rounded-full text-xs font-semibold">
                 {resultCount}
               </span>
             </>
           ) : (
             <>
-              <Search size={20} />
+              <Search size={18} />
               <span>Search Blogs</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Expanded Search Panel */}
+      {/* PANEL (PURE WHITE ALWAYS) */}
       {isExpanded && (
-        <div className="bg-white dark:bg-[#2A221C] rounded-2xl shadow-2xl border border-gray-200 dark:border-[#6B4A2E] p-6 max-w-2xl mx-auto">
-          {/* Search Type Selector */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            <button
-              onClick={() => setSearchType("text")}
-              className={`px-4 py-2 rounded-lg transition ${
-                searchType === "text"
-                  ? "bg-gradient-to-r from-[#6B4A2E] to-[#D9A441] text-white dark:text-black"
-                  : "bg-gray-100 dark:bg-[#1F1A16] text-gray-700 dark:text-[#D8C9B4]"
-              }`}
-            >
-              Text Search
-            </button>
-            <button
-              onClick={() => setSearchType("author")}
-              className={`px-4 py-2 rounded-lg transition ${
-                searchType === "author"
-                  ? "bg-gradient-to-r from-[#6B4A2E] to-[#D9A441] text-white dark:text-black"
-                  : "bg-gray-100 dark:bg-[#1F1A16] text-gray-700 dark:text-[#D8C9B4]"
-              }`}
-            >
-              Author Filter
-            </button>
-            <button
-              onClick={() => setSearchType("date")}
-              className={`px-4 py-2 rounded-lg transition ${
-                searchType === "date"
-                  ? "bg-gradient-to-r from-[#6B4A2E] to-[#D9A441] text-white dark:text-black"
-                  : "bg-gray-100 dark:bg-[#1F1A16] text-gray-700 dark:text-[#D8C9B4]"
-              }`}
-            >
-              Date Filter
-            </button>
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 max-w-2xl mx-auto">
+
+          {/* TABS */}
+          <div className="flex gap-2 mb-6">
+            {["text", "author", "date"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setSearchType(type as any)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  searchType === type
+                    ? "bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {type === "text" && "Text"}
+                {type === "author" && "Author"}
+                {type === "date" && "Date"}
+              </button>
+            ))}
           </div>
 
-          {/* Text Search */}
+          {/* TEXT */}
           {searchType === "text" && (
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Search by title, content, or author..."
-                value={filters.searchTerm}
-                onChange={(e) => handleSearchTermChange(e.target.value)}
-                className="w-full p-4 rounded-xl border border-gray-300 dark:border-[#6B4A2E] bg-white dark:bg-[#2A221C] text-gray-900 dark:text-[#F6F1EA] placeholder-gray-500 dark:placeholder-[#A67C52] focus:outline-none focus:ring-2 focus:ring-[#D9A441] transition-all"
-                autoFocus
-              />
-              <p className="text-sm text-gray-600 dark:text-[#D8C9B4]">
-                Search through blog titles, content, and author names
-              </p>
-            </div>
+            <input
+              type="text"
+              placeholder="Search blogs..."
+              value={filters.searchTerm}
+              onChange={(e) => handleSearchTermChange(e.target.value)}
+              className="w-full p-3 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-[#2563EB] outline-none"
+            />
           )}
 
-          {/* Author Filter */}
+          {/* AUTHOR */}
           {searchType === "author" && (
-            <div className="space-y-4">
-              <select
-                value={filters.authorFilter}
-                onChange={(e) => handleAuthorFilterChange(e.target.value)}
-                className="w-full p-4 rounded-xl border border-gray-300 dark:border-[#6B4A2E] bg-white dark:bg-[#2A221C] text-gray-900 dark:text-[#F6F1EA] focus:outline-none focus:ring-2 focus:ring-[#D9A441]"
-              >
-                <option value="all">All Authors</option>
-                {authors.map((author) => (
-                  <option key={author} value={author}>
-                    {author}
-                  </option>
-                ))}
-              </select>
-              <p className="text-sm text-gray-600 dark:text-[#D8C9B4]">
-                Filter blogs by specific authors
-              </p>
-            </div>
+            <select
+              value={filters.authorFilter}
+              onChange={(e) => handleAuthorFilterChange(e.target.value)}
+              className="w-full p-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:ring-2 focus:ring-[#2563EB]"
+            >
+              <option value="all">All Authors</option>
+              {authors.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
           )}
 
-          {/* Date Filter */}
+          {/* DATE */}
           {searchType === "date" && (
-            <div className="space-y-4">
-              <input
-                type="date"
-                value={filters.dateFilter}
-                onChange={(e) => handleDateFilterChange(e.target.value)}
-                className="w-full p-4 rounded-xl border border-gray-300 dark:border-[#6B4A2E] bg-white dark:bg-[#2A221C] text-gray-900 dark:text-[#F6F1EA] focus:outline-none focus:ring-2 focus:ring-[#D9A441]"
-              />
-              <p className="text-sm text-gray-600 dark:text-[#D8C9B4]">
-                Filter blogs by specific publish date
-              </p>
-            </div>
+            <input
+              type="date"
+              value={filters.dateFilter}
+              onChange={(e) => handleDateFilterChange(e.target.value)}
+              className="w-full p-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:ring-2 focus:ring-[#2563EB]"
+            />
           )}
 
-          {/* Actions */}
-          <div className="flex justify-between items-center mt-6 pt-6 border-t border-gray-200 dark:border-[#6B4A2E]">
-            <div className="text-sm text-gray-600 dark:text-[#D8C9B4]">
-              {hasActiveFilters ? (
-                <>
-                  Found {resultCount} of {totalCount} blogs
-                  {filters.searchTerm && ` for "${filters.searchTerm}"`}
-                  {filters.authorFilter !== "all" && ` by ${filters.authorFilter}`}
-                  {filters.dateFilter && ` on ${filters.dateFilter}`}
-                </>
-              ) : (
-                `Browse ${totalCount} blogs`
-              )}
-            </div>
+          {/* FOOTER */}
+          <div className="flex justify-between items-center mt-6 pt-5 border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              {hasActiveFilters
+                ? `${resultCount} of ${totalCount} results`
+                : `${totalCount} blogs`}
+            </p>
+
             <div className="flex gap-2">
               {hasActiveFilters && (
                 <button
                   onClick={clearAllFilters}
-                  className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 dark:bg-[#1F1A16] text-gray-700 dark:text-[#D8C9B4] rounded-lg hover:bg-gray-200 dark:hover:bg-[#6B4A2E] transition"
+                  className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
                 >
-                  <X size={16} />
+                  <X size={14} />
                   Clear
                 </button>
               )}
+
               <button
                 onClick={() => setIsExpanded(false)}
-                className="px-4 py-2 text-sm bg-gradient-to-r from-[#6B4A2E] to-[#D9A441] text-white dark:text-black rounded-lg hover:opacity-90 transition"
+                className="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white"
               >
                 Done
               </button>

@@ -28,16 +28,12 @@ export default function Navbar() {
   const handleNavigation = () => setLoading(true);
   useEffect(() => setLoading(false), [pathname]);
 
-  // Handle scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (aboutRef.current && !aboutRef.current.contains(e.target as Node)) {
@@ -55,66 +51,82 @@ export default function Navbar() {
     { href: "/sabbath-school", label: "Sabbath School", icon: FaUsers },
     { href: "/library", label: "Library", icon: FaBookOpen },
     { href: "/blog", label: "Blog", icon: FaWater },
-    { href: "#", label: "Donate", icon: FaDonate },
+    { href: "/finance", label: "GIVE", icon: FaDonate },
     { href: "/prayer", label: "Prayer Request", icon: FaPrayingHands },
   ];
 
   return (
     <>
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled 
-          ? "bg-gradient-to-r from-blue-900/95 via-blue-800/95 to-blue-900/95 backdrop-blur-md shadow-2xl" 
-          : "bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900"
-      } border-b border-blue-400/20`}>
+      <nav
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200"
+            : "bg-white"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20 lg:h-24">
-            
-            {/* Logo */}
-            <Link href="/" onClick={handleNavigation} className="flex items-center gap-3 group">
-              <div className="relative w-16 h-16 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-105">
-                <Image src="/images/logo.jpeg" alt="Logo" fill className="object-cover" />
+          <div className="flex justify-between items-center h-20">
+
+            {/* LOGO */}
+            <Link
+              href="/"
+              onClick={handleNavigation}
+              className="flex items-center gap-3 group"
+            >
+              <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-md group-hover:scale-105 transition">
+                <Image
+                  src="/images/logo.jpeg"
+                  alt="Logo"
+                  fill
+                  className="object-cover"
+                />
               </div>
+
               <div>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-black bg-gradient-to-r from-blue-100 via-cyan-100 to-blue-200 bg-clip-text text-transparent">
-                  Old SDA 
+                <h1 className="text-xl font-extrabold text-gray-900">
+                  Old SDA
                 </h1>
-                <p className="text-xs sm:text-sm text-cyan-200/80 -mt-1">
-                  Restoring Old Adventism 
+                <p className="text-xs text-gray-500 -mt-1">
+                  Restoring Adventism
                 </p>
               </div>
             </Link>
 
-            {/* Desktop Nav */}
+            {/* DESKTOP NAV */}
             <div className="hidden lg:flex items-center gap-2">
 
-              {/* About Us Dropdown */}
+              {/* ABOUT DROPDOWN */}
               <div ref={aboutRef} className="relative">
                 <button
                   onClick={() => setAboutOpen(!aboutOpen)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium text-sm ${
-                    pathname.startsWith("/about") || pathname.startsWith("/members")
-                      ? "bg-blue-600/50 text-white backdrop-blur-sm"
-                      : "text-cyan-100 hover:bg-blue-700/50 hover:text-white"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                    aboutOpen
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <FaUsers />
-                  <span>About Us</span>
-                  <FaChevronDown className={`text-xs transition-transform duration-200 ${aboutOpen ? "rotate-180" : ""}`} />
+                  About
+                  <FaChevronDown
+                    className={`text-xs transition-transform ${
+                      aboutOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
                 {aboutOpen && (
-                  <div className="absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl overflow-hidden bg-gradient-to-b from-blue-800 to-blue-900 backdrop-blur-md border border-blue-400/30 animate-slideDown">
+                  <div className="absolute top-full mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-fadeIn">
                     <Link
                       href="/about"
                       onClick={() => setAboutOpen(false)}
-                      className="block px-4 py-2 text-sm text-cyan-100 hover:bg-blue-700/50 hover:text-white transition-all duration-200"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100"
                     >
                       About Us
                     </Link>
                     <Link
                       href="/members"
                       onClick={() => setAboutOpen(false)}
-                      className="block px-4 py-2 text-sm text-cyan-100 hover:bg-blue-700/50 hover:text-white transition-all duration-200"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100"
                     >
                       Our Team
                     </Link>
@@ -122,44 +134,43 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Other Nav Items */}
+              {/* NAV ITEMS */}
               {publicNavItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={handleNavigation}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium text-sm whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
                     isActive(item.href)
-                      ? "bg-blue-600/50 text-white backdrop-blur-sm shadow-md"
-                      : "text-cyan-100 hover:bg-blue-700/50 hover:text-white hover:shadow-md"
+                      ? "text-blue-700 bg-blue-50"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <item.icon />
-                  <span>{item.label}</span>
+                  {item.label}
                 </Link>
               ))}
             </div>
 
-            {/* Mobile Button */}
+            {/* MOBILE */}
             <div className="lg:hidden">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 rounded-lg bg-blue-600/30 backdrop-blur-sm hover:bg-blue-600/50 transition-all duration-200"
+                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
               >
-                <FaBars className="text-xl text-cyan-100" />
+                <FaBars className="text-xl text-gray-700" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Loading Progress Bar */}
+        {/* LOADING BAR */}
         {loading && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 animate-pulse" />
+          <div className="h-0.5 bg-gradient-to-r from-blue-500 to-cyan-400 animate-pulse" />
         )}
       </nav>
 
-      {/* Spacer to prevent content from hiding under fixed navbar */}
-      <div className="h-20 lg:h-24" />
+      <div className="h-20" />
 
       {sidebarOpen && (
         <Sidebar
@@ -172,23 +183,6 @@ export default function Navbar() {
           ]}
         />
       )}
-
-      {/* Add animation keyframes if not already in your global CSS */}
-      <style jsx global>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slideDown {
-          animation: slideDown 0.2s ease-out;
-        }
-      `}</style>
     </>
   );
 }

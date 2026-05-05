@@ -7,6 +7,7 @@ import {
   FaTachometerAlt,
   FaUsers,
   FaBookOpen,
+  FaCalendarAlt,
   FaDonate,
   FaPrayingHands,
 } from "react-icons/fa";
@@ -21,12 +22,13 @@ const navItems = [
 
   { href: "/admin/blog/post", label: "Post Blog", icon: FaBookOpen },
   { href: "/admin/blog/blog-delete", label: "Edit / Delete Blog", icon: FaBookOpen },
+  { href: "/admin/events", label: "Event Manager", icon: FaCalendarAlt },
+  { href: "/admin/finance", label: "Finance ERP", icon: FaDonate },
 
   { href: "/admin/bible-studies", label: "Upload Study Notes", icon: FaBookOpen },
   { href: "/admin/upload-video", label: "Upload Video", icon: FaBookOpen },
 
   { href: "/admin/received-prayer", label: "Prayer Requests", icon: FaPrayingHands },
-  { href: "#", label: "Contributions", icon: FaDonate },
 ];
 
 export default function AdminLayout({

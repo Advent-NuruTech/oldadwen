@@ -18,6 +18,7 @@ const navItems = [
   { href: "/members/add-member", label: "Add Member", icon: FaUsers },
   { href: "/members/edit-member", label: "Edit Members", icon: FaUsers },
   { href: "/admin/sabbath-school/add-lesson", label: "Add Lesson", icon: FaBookOpen },
+  { href: "/admin/events", label: "Add Event", icon: FaBookOpen },
   { href: "/admin/sabbath-school/edit-lesson", label: "Edit Lessons", icon: FaBookOpen },
   { href: "/dmin/blog/post", label: "Add Blog", icon: FaBookOpen },
   { href: "/admin/received-prayer", label: "Prayer Requests", icon: FaPrayingHands },

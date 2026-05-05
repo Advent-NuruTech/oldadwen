@@ -13,37 +13,40 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://gspublicationsandmissions.org"),
+  metadataBase: new URL("https://oldsda.org"),
 
   title: {
-    default: "Gospel Sounders Publications & Missions",
-    template: "%s | Gospel Sounders Publications & Missions",
+    default: "Old SDA Organization",
+    template: "%s | Old SDA Organization",
   },
 
   description:
-    "Gospel Sounders Publications & Missions is dedicated to revealing the Father and the Son through sound doctrine, Bible studies, publications, and missionary work, proclaiming the Three Angels’ Messages to all nations.",
+    "Old SDA Organization is a Bible-based reform movement rooted in historic Adventism, proclaiming the One True God (the Father), the literal Son of God, and rejecting the Trinity. We uphold pioneer Adventist teachings, the Three Angels’ Messages, health reform, and missionary work as part and parcel of true Bible faith.",
 
-  applicationName: "Gospel Sounders",
+  applicationName: "Old SDA Organization",
 
   keywords: [
-    "Gospel Sounders",
-    "Three Angels Message",
+    "Old SDA Organization",
+    "Old Adventism",
     "Historic Adventism",
-    "Bible Studies",
-    "Sanctuary Message",
-    "Sabbath Truth",
+    "Pioneer Adventist Faith",
+    "One True God",
+    "Non-Trinitarian",
+    "Anti-Trinitarian",
+    "Trinity rejection",
+    "Bible truth movement",
+    "Three Angels Message",
+    "Sabbath truth",
     "Spirit of Prophecy",
-    "Christian Publications",
-    "Missionary Work",
-    "Zadock Opiyo Ponde",
-    "Wyclife Omondi",
-    "One true God"
-
+    "Adventist reform movement",
+    "Health reform",
+    "Bible studies",
+    "Missionary work",
   ],
 
-  authors: [{ name: "Gospel Sounders Publications & Missions" }],
-  creator: "Gospel Sounders Publications & Missions",
-  publisher: "Gospel Sounders Publications & Missions",
+  authors: [{ name: "Old SDA Organization" }],
+  creator: "Old SDA Organization",
+  publisher: "Old SDA Organization",
 
   robots: {
     index: true,
@@ -56,26 +59,26 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: "website",
-    url: "https://gspublicationsandmissions.org",
-    title: "Gospel Sounders Publications & Missions",
+    url: "https://oldsda.org",
+    title: "Old SDA Organization",
     description:
-      "Revealing the Father and the Son, proclaiming the everlasting gospel through the three angels’ messages, restoring biblical truth, and practically preparing a people for Christ’s soon return.",
-    siteName: "Gospel Sounders Publications & Missions",
+      "A Bible-based reform movement restoring pioneer Adventist faith, proclaiming the One True God, rejecting the Trinity, and advancing the Three Angels’ Messages worldwide.",
+    siteName: "Old SDA Organization",
     images: [
       {
-        url: "/images/logo.jpeg", // PLACE THIS IN /public
+        url: "/images/logo.jpeg",
         width: 1200,
         height: 630,
-        alt: "Gospel Sounders Publications & Missions Logo",
+        alt: "Old SDA Organization Logo",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Gospel Sounders Publications & Missions",
+    title: "Old SDA Organization",
     description:
-      "Revealing the Father and the Son, proclaiming the everlasting gospel through the three angels’ messages, restoring biblical truth, and practically preparing a people for Christ’s soon return.",
+      "Restoring pioneer Adventist faith: One True God, non-Trinitarian belief, and the Three Angels’ Messages.",
     images: ["/images/logo.jpeg"],
   },
 
@@ -86,7 +89,7 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: "https://gspublicationsandmissions.org",
+    canonical: "https://oldsda.org",
   },
 };
 

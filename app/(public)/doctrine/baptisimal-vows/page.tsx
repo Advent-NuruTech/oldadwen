@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import Link from "next/link";
 
 const vows = [
   "1. Do you accept all the Bible as the inspired word of God, and do you take it as your only rule of faith? Is it your purpose to ever walk according to its teachings? 2 Tim. 3:16,17; Acts 20:32.",
@@ -19,82 +18,87 @@ const vows = [
   "13. Will you seek to build up the interests of the church by giving the Sabbath School your hearty and practical support and attending, as far as possible, all services of the church? And will you endeavour by God's help to do your part in the work of the church? Luke 4:16; Rom. 12:4-8.",
   "14. Do you recognise that the remnant church has the Spirit of Prophecy, and that this has been manifested to this church through the writings of Ellen G. White? Rev. 12:17; 19:10.",
   "15. Do you believe in baptism by immersion only, and are you ready to follow your Lord and Master in this sacred rite? Matt. 28:18-20; Col. 2:12; Rom. 6:3-5.",
-  'My Purpose: Having given myself fully to God, and desiring to truly serve Him here and to live with Him forever, I hereby declare my acceptance of these principles of truth, and my obedience to them by His grace.'
+  "16. My Purpose: Having given myself fully to God, and desiring to truly serve Him here and to live with Him forever, I hereby declare my acceptance of these principles of truth, and my obedience to them by His grace."
 ];
+
+// Helper to extract number and text from each vow
+function parseVow(text: string): { number: string; content: string } {
+  const match = text.match(/^(\d+)\.\s+([\s\S]*)$/);
+  if (match) {
+    return { number: match[1], content: match[2] };
+  }
+  // For "My Purpose" which has no number
+  if (text.startsWith("My Purpose:")) {
+    return { number: "", content: text };
+  }
+  return { number: "", content: text };
+}
 
 export default function VowsPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-emerald-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-16 px-4 md:px-8">
-      {/* Header */}
-      <section className="text-center mb-12">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl font-extrabold text-[#3B2414] dark:text-emerald-300 tracking-tight"
-        >
+    <main className="min-h-screen bg-gradient-to-b from-[#020617] via-[#0b1220] to-[#020617] text-white px-4 sm:px-6 py-12 sm:py-16">
+
+      {/* HEADER */}
+      <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
           Baptismal Vows
-        </motion.h1>
+        </h1>
+        <div className="h-1 w-24 mx-auto mt-4 bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500 rounded-full" />
+        <p className="text-blue-200 text-lg sm:text-xl md:text-2xl mt-6 max-w-2xl mx-auto">
+          <span className="text-cyan-300 font-semibold">A Sacred Commitment</span> | Following Your Lord in Baptism
+        </p>
+      </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-4 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
-        >
-          These 13 vows represent the believer’s personal commitment to follow
-          Jesus Christ, uphold biblical truth, and live a life of service and
-          holiness in harmony with God’s will.
-        </motion.p>
-      </section>
+      {/* INTRODUCTORY STATEMENT */}
+      <div className="max-w-4xl mx-auto mb-10 sm:mb-12 bg-white/5 border border-blue-500/20 rounded-2xl p-5 sm:p-6 md:p-8 backdrop-blur-md">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-300 text-center mb-4 sm:mb-6">Baptismal Covenant</h2>
+        <p className="text-blue-100 text-lg sm:text-xl md:text-2xl leading-relaxed text-center">
+          These vows represent the believer's personal commitment to follow Jesus Christ, 
+          uphold biblical truth, and live a life of service and holiness in harmony with God's will.
+        </p>
+        <p className="text-cyan-300 text-lg sm:text-xl mt-5 sm:mt-6 font-semibold text-center">I solemnly declare:</p>
+      </div>
 
-      {/* Vows List */}
-      <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {vows.map((text, index) => (
-          <VowCard key={index} text={text} />
-        ))}
-      </section>
+      {/* VOWS LIST */}
+      <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+        {vows.map((vow, index) => {
+          const { number, content } = parseVow(vow);
+          const isLastVow = index === vows.length - 1;
+          
+          return (
+            <section 
+              key={index}
+              className={`
+                bg-white/5 border border-blue-500/20 rounded-2xl p-5 sm:p-6 md:p-8 backdrop-blur-md 
+                transition-all hover:border-cyan-500/40
+                ${isLastVow ? 'bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-blue-950/40 border-cyan-500/30' : ''}
+              `}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
+                {number && (
+                  <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-cyan-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/20 mx-auto sm:mx-0">
+                    <span className="text-white text-xl sm:text-2xl font-bold">{number}</span>
+                  </div>
+                )}
+                <p className="text-blue-100 text-lg sm:text-xl md:text-xl leading-relaxed flex-1 text-center sm:text-left">
+                  {content}
+                </p>
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
-      
+      {/* FOOTER */}
+      <div className="text-center pt-10 sm:pt-12 border-t border-blue-500/20 max-w-4xl mx-auto mt-8 sm:mt-8">
+        <div className="bg-blue-950/30 border-l-4 border-cyan-400 p-5 sm:p-6 max-w-2xl mx-auto rounded-r-xl">
+          <p className="text-cyan-200 italic text-lg sm:text-xl md:text-2xl">
+            “Therefore we are buried with him by baptism into death: that like as Christ was raised up from the dead by the glory of the Father, even so we also should walk in newness of life.”
+          </p>
+          <p className="text-blue-200 font-semibold mt-2 text-base sm:text-lg">Romans 6:4</p>
+        </div>
+        <p className="text-blue-400 text-xs sm:text-sm mt-6">Baptismal Vows — Based on the Historic Seventh-day Adventist Church Manual</p>
+      </div>
     </main>
-  );
-}
-
-// Individual Vow Card with Read More toggle
-function VowCard({ text }: { text: string }) {
-  const [expanded, setExpanded] = useState(false);
-  const wordLimit = 60;
-
-  const words = text.split(" ");
-  const showReadMore = words.length > wordLimit;
-  const visibleText = expanded ? text : words.slice(0, wordLimit).join(" ") + (showReadMore ? "..." : "");
-
-  // Extract number
-  const numberMatch = text.match(/^(\d+)\./);
-  const number = numberMatch ? numberMatch[1] : "";
-  const content = number ? text.replace(`${number}. `, "") : text;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.3 }}
-      className="p-5 rounded-2xl bg-white dark:bg-gray-800 shadow-md border border-[#B5D8C6] dark:border-gray-700 hover:shadow-lg hover:border-[#8FCFB1] dark:hover:border-emerald-400 transition-all duration-300 flex flex-col"
-    >
-      <h2 className="text-gray-900 dark:text-gray-200 font-medium leading-relaxed">
-        <span className="text-[#E94B3C] dark:text-red-400 font-bold mr-2">{number}.</span>
-        <span>{expanded ? content : visibleText.replace(`${number}. `, "")}</span>
-      </h2>
-
-      {showReadMore && (
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-red-600 dark:text-red-400 font-semibold text-sm hover:underline self-start"
-        >
-          {expanded ? "Read Less" : "Read More"}
-        </button>
-      )}
-    </motion.div>
   );
 }
