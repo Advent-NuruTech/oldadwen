@@ -71,23 +71,30 @@ export default function FinanceForm({
 
   const selectedCategory = orderedCategories.find((entry) => entry.id === value.categoryId);
 
-  return (
-    <div className="space-y-6">
-      <StructureSelector
-        conferences={conferences}
-        regions={filteredRegions}
-        churches={filteredChurches}
-        conferenceId={value.conferenceId || ""}
-        regionId={value.regionId || ""}
-        churchId={value.churchId || ""}
-        donorType={donorType}
-        onConferenceChange={(conferenceId) => onChange({ conferenceId, regionId: "", churchId: "", donorType })}
-        onRegionChange={(regionId) => onChange({ regionId, churchId: "", donorType })}
-        onChurchChange={(churchId) => onChange({ churchId, donorType })}
-      />
+  // Only show structure selector for members
+  const showStructureSelector = donorType === "member";
 
-      <section className="bg-white rounded-2xl p-5 border border-slate-200">
-        <h3 className="font-semibold text-slate-900">Contribution Type</h3>
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Church structure - ONLY for members */}
+      {showStructureSelector && (
+        <StructureSelector
+          conferences={conferences}
+          regions={filteredRegions}
+          churches={filteredChurches}
+          conferenceId={value.conferenceId || ""}
+          regionId={value.regionId || ""}
+          churchId={value.churchId || ""}
+          donorType={donorType}
+          onConferenceChange={(conferenceId) => onChange({ conferenceId, regionId: "", churchId: "", donorType })}
+          onRegionChange={(regionId) => onChange({ regionId, churchId: "", donorType })}
+          onChurchChange={(churchId) => onChange({ churchId, donorType })}
+        />
+      )}
+
+      {/* Contribution Type Section */}
+      <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+        <h3 className="font-semibold text-slate-900 text-base sm:text-lg">Contribution Type</h3>
 
         <select
           value={value.categoryId || ""}
@@ -96,7 +103,7 @@ export default function FinanceForm({
             const category = orderedCategories.find((entry) => entry.id === categoryId);
             onChange({ categoryId, type: category?.type, donorType });
           }}
-          className="w-full mt-3 border rounded-lg p-2"
+          className="w-full mt-3 border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
         >
           <option value="">Select Type</option>
           {orderedCategories.map((entry) => (
@@ -111,52 +118,72 @@ export default function FinanceForm({
             placeholder="Purpose (optional)"
             value={value.purpose || ""}
             onChange={(event) => onChange({ purpose: event.target.value, donorType })}
-            className="w-full mt-3 border rounded-lg p-2"
+            className="w-full mt-3 border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
         )}
       </section>
 
-      <section className="bg-white rounded-2xl p-5 border border-slate-200">
-        <h3 className="font-semibold text-slate-900">Amount (required)</h3>
+      {/* Amount Section */}
+      <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+        <h3 className="font-semibold text-slate-900 text-base sm:text-lg">Amount (required)</h3>
 
         <input
           type="number"
           min={1}
           value={value.amount ? String(value.amount) : ""}
           onChange={(event) => onChange({ amount: Number(event.target.value), donorType })}
-          className="w-full mt-3 border rounded-lg p-2"
+          className="w-full mt-3 border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           placeholder="Enter amount"
         />
       </section>
 
-      <section className="bg-white rounded-2xl p-5 border border-slate-200">
-        <h3 className="font-semibold text-slate-900">Personal Details (optional)</h3>
+      {/* Personal Details Section - Always visible with responsive grid */}
+      <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+        <h3 className="font-semibold text-slate-900 text-base sm:text-lg mb-3">Personal Details (optional)</h3>
 
-        <div className="grid md:grid-cols-2 gap-3 mt-3">
-          <input
-            placeholder="Name"
-            value={value.name || ""}
-            onChange={(event) => onChange({ name: event.target.value, donorType })}
-            className="border p-2 rounded-lg"
-          />
-          <input
-            placeholder="Phone"
-            value={value.phone || ""}
-            onChange={(event) => onChange({ phone: event.target.value, donorType })}
-            className="border p-2 rounded-lg"
-          />
-          <input
-            placeholder="Email"
-            value={value.email || ""}
-            onChange={(event) => onChange({ email: event.target.value, donorType })}
-            className="border p-2 rounded-lg"
-          />
-          <input
-            placeholder="Message"
-            value={value.message || ""}
-            onChange={(event) => onChange({ message: event.target.value, donorType })}
-            className="border p-2 rounded-lg"
-          />
+        {/* Improved responsive grid - always shows inputs properly */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1">
+            <label className="text-xs sm:text-sm font-medium text-slate-700">Full Name</label>
+            <input
+              placeholder="Enter your name"
+              value={value.name || ""}
+              onChange={(event) => onChange({ name: event.target.value, donorType })}
+              className="w-full border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
+          </div>
+          
+          <div className="space-y-1">
+            <label className="text-xs sm:text-sm font-medium text-slate-700">Phone Number</label>
+            <input
+              placeholder="Enter your phone"
+              value={value.phone || ""}
+              onChange={(event) => onChange({ phone: event.target.value, donorType })}
+              className="w-full border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
+          </div>
+          
+          <div className="space-y-1">
+            <label className="text-xs sm:text-sm font-medium text-slate-700">Email Address</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={value.email || ""}
+              onChange={(event) => onChange({ email: event.target.value, donorType })}
+              className="w-full border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
+          </div>
+          
+          <div className="space-y-1 sm:col-span-2">
+            <label className="text-xs sm:text-sm font-medium text-slate-700">Message (Optional)</label>
+            <textarea
+              placeholder="Write your message here..."
+              value={value.message || ""}
+              onChange={(event) => onChange({ message: event.target.value, donorType })}
+              rows={3}
+              className="w-full border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y"
+            />
+          </div>
         </div>
       </section>
     </div>

@@ -6,19 +6,18 @@ import {
   addDoc,
   serverTimestamp,
   getDocs,
-  query,
-  orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import RichTextEditor from "@/components/RichTextEditor";
+import { AnimatePresence, motion } from "framer-motion";
 
 const capitalizeEachWord = (str: string): string => {
   if (!str) return "";
   return str
     .trim()
     .split(/\s+/)
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(" ");
 };
 
@@ -27,27 +26,64 @@ export default function AddMemberPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState("");
   const [role, setRole] = useState("");
+
   const [existingRoles, setExistingRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch roles
+  // ROLE MODAL
+  const [roleModal, setRoleModal] = useState(false);
+  const [newRole, setNewRole] = useState("");
+
+  // TOAST
+  const [toast, setToast] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  const showToast = (type: "success" | "error" | "info", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // FETCH ROLES
+  const fetchRoles = async () => {
+    const snap = await getDocs(collection(db, "roles"));
+
+    const roles = new Set<string>();
+
+    snap.forEach((d) => {
+      const r = d.data().name;
+      if (r?.trim()) roles.add(capitalizeEachWord(r));
+    });
+
+    setExistingRoles(Array.from(roles).sort());
+  };
+
   useEffect(() => {
-    const fetchRoles = async () => {
-      const q = query(collection(db, "members"), orderBy("createdAt", "desc"));
-      const snap = await getDocs(q);
-
-      const roles = new Set<string>();
-      snap.forEach((d) => {
-        const r = d.data().role;
-        if (r?.trim()) roles.add(capitalizeEachWord(r));
-      });
-
-      setExistingRoles(Array.from(roles).sort());
-    };
-
     fetchRoles();
   }, []);
 
+  // CREATE ROLE (MODERN)
+  const createRole = async () => {
+    if (!newRole.trim()) return;
+
+    const formatted = capitalizeEachWord(newRole);
+
+    await addDoc(collection(db, "roles"), {
+      name: formatted,
+      createdAt: serverTimestamp(),
+    });
+
+    setRole(formatted);
+    setNewRole("");
+    setRoleModal(false);
+
+    await fetchRoles();
+
+    showToast("success", `Role "${formatted}" created`);
+  };
+
+  // CREATE MEMBER (WITH IMAGE FIXED)
   const handleSubmit = async () => {
     if (!name.trim()) return;
 
@@ -56,167 +92,163 @@ export default function AddMemberPage() {
     try {
       let imageUrl = "";
 
+      // ✅ IMAGE UPLOAD RESTORED
       if (imageFile) {
         imageUrl = await uploadToCloudinary(imageFile);
       }
 
       await addDoc(collection(db, "members"), {
         name: name.trim(),
-        imageUrl,
+        imageUrl, // ✅ now properly stored
         metadata,
         role: role.trim() || "",
         createdAt: serverTimestamp(),
       });
 
-      // reset
       setName("");
       setImageFile(null);
       setMetadata("");
       setRole("");
+
+      showToast("success", "Member added successfully");
+    } catch (err) {
+      showToast("error", "Failed to add member");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="
-      min-h-screen p-6
-      bg-gradient-to-br from-[#0A0E27] via-[#0F172A] to-[#1E1B4B]
-    ">
+    <main className="min-h-screen p-6 bg-gradient-to-br from-[#0A0E27] via-[#0F172A] to-[#1E1B4B]">
       <div className="max-w-3xl mx-auto space-y-8">
+
+        {/* TOAST */}
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className={`
+                fixed bottom-6 right-6 z-50
+                px-4 py-3 rounded-xl text-white text-sm
+                backdrop-blur-md border shadow-xl
+                ${
+                  toast.type === "success"
+                    ? "bg-green-500/20 border-green-400"
+                    : toast.type === "error"
+                    ? "bg-red-500/20 border-red-400"
+                    : "bg-blue-500/20 border-blue-400"
+                }
+              `}
+            >
+              {toast.message}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ROLE MODAL */}
+        <AnimatePresence>
+          {roleModal && (
+            <motion.div
+              className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="w-[90%] max-w-md bg-[#0F172A] border border-[#334155] rounded-2xl p-6 space-y-4">
+                <h2 className="text-white text-lg font-bold">
+                  Create New Role
+                </h2>
+
+                <input
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value)}
+                  placeholder="Enter role name..."
+                  className="w-full p-3 rounded-lg bg-[#1E293B] text-white border border-[#334155]"
+                />
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setRoleModal(false)}
+                    className="text-gray-400"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={createRole}
+                    className="px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    Save Role
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* HEADER */}
         <div className="text-center">
-          <div className="inline-block mb-3 px-3 py-1 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/30">
-            <span className="text-xs font-medium text-[#60A5FA]">
-              Members
-            </span>
-          </div>
-
-          <h1 className="text-4xl font-extrabold text-white">
-            Add New Member
-          </h1>
-
-          <p className="text-gray-400 mt-2">
-            Create and manage church members
-          </p>
+          <h1 className="text-4xl font-bold text-white">Add New Member</h1>
         </div>
 
-        {/* FORM CARD */}
-        <section className="
-          rounded-2xl overflow-hidden
-          bg-gradient-to-br from-[#1E293B]/40 via-[#0F172A]/40 to-[#1E1B4B]/40
-          backdrop-blur-sm
-          border border-[#334155]
-          shadow-2xl
-          p-6 md:p-8
-          space-y-6
-        ">
+        {/* FORM */}
+        <section className="rounded-2xl p-6 space-y-6 bg-[#1E293B]/40 border border-[#334155]">
 
           {/* NAME */}
-          <div>
-            <label className="block mb-2 text-sm font-semibold text-[#60A5FA]">
-              Member Name
-            </label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter full name"
-              className="
-                w-full p-3 rounded-lg
-                bg-[#1E293B]/60 text-white
-                border border-[#334155]
-                focus:border-[#60A5FA]
-                focus:ring-2 focus:ring-[#60A5FA]/20
-                outline-none
-              "
-            />
-          </div>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Member name"
+            className="w-full p-3 rounded-lg bg-[#0F172A] text-white border border-[#334155]"
+          />
 
           {/* ROLE */}
           <div>
-            <label className="block mb-2 text-sm font-semibold text-[#60A5FA]">
-              Role <span className="text-gray-400 text-xs">(Optional)</span>
-            </label>
-
             <select
               value={role}
-              onChange={(e) => {
-                if (e.target.value === "new") {
-                  const r = prompt("Enter new role:");
-                  if (r) setRole(capitalizeEachWord(r));
-                } else {
-                  setRole(e.target.value);
-                }
-              }}
-              className="
-                w-full p-3 rounded-lg
-                bg-[#1E293B]/60 text-white
-                border border-[#334155]
-                focus:border-[#60A5FA]
-                focus:ring-2 focus:ring-[#60A5FA]/20
-                outline-none
-              "
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full p-3 rounded-lg bg-[#0F172A] text-white border border-[#334155]"
             >
               <option value="">Select role</option>
               {existingRoles.map((r) => (
-                <option key={r} value={r}>{r}</option>
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
-              <option value="new">+ Add new role</option>
             </select>
+
+            <button
+              onClick={() => setRoleModal(true)}
+              className="mt-2 text-sm text-blue-400 hover:underline"
+            >
+              + Add new role
+            </button>
           </div>
 
-          {/* IMAGE */}
+          {/* IMAGE UPLOAD (RESTORED FIX) */}
           <div>
-            <label className="block mb-2 text-sm font-semibold text-[#60A5FA]">
-              Image
-            </label>
-
+            <label className="text-sm text-[#60A5FA]">Image</label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-              className="
-                w-full text-sm text-gray-300
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-lg file:border-0
-                file:bg-[#60A5FA] file:text-white
-                file:hover:bg-[#93C5FD]
-                cursor-pointer
-              "
+              className="w-full text-white mt-2"
             />
           </div>
 
           {/* DETAILS */}
-          <div>
-            <label className="block mb-2 text-sm font-semibold text-[#60A5FA]">
-              Member Details
-            </label>
+          <RichTextEditor value={metadata} onChange={setMetadata} />
 
-            <div className="
-              border border-[#334155]
-              rounded-lg overflow-hidden
-              bg-[#1E293B]/60
-            ">
-              <RichTextEditor value={metadata} onChange={setMetadata} />
-            </div>
-          </div>
-
-          {/* BUTTON */}
+          {/* SUBMIT */}
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="
-              w-full py-3 rounded-lg font-bold text-white
-              bg-gradient-to-r from-[#2563EB] to-[#1D4ED8]
-              hover:shadow-2xl hover:scale-[1.02]
-              transition-all duration-300
-              disabled:opacity-50
-            "
+            className="w-full py-3 rounded-lg text-white font-bold bg-gradient-to-r from-blue-600 to-blue-800"
           >
             {loading ? "Saving..." : "Add Member"}
           </button>
-
         </section>
       </div>
     </main>

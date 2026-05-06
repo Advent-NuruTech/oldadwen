@@ -14,6 +14,7 @@ import {
 import { db } from "@/lib/firebase";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import RichTextEditor from "../RichTextEditor";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface MemberData {
   id: string;
@@ -32,7 +33,9 @@ const capitalizeEachWord = (str: string): string => {
   return str
     .trim()
     .split(/\s+/)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map(
+      (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
     .join(" ");
 };
 
@@ -44,26 +47,43 @@ export default function AddMember({ member }: AddMemberProps) {
   const [loading, setLoading] = useState(false);
   const [existingRoles, setExistingRoles] = useState<string[]>([]);
 
+  // MODAL STATE
+  const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [newRole, setNewRole] = useState("");
+
+  // TOAST
+  const [toast, setToast] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  const showToast = (type: "success" | "error" | "info", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // FETCH ROLES
+  const fetchRoles = async () => {
+    const roleQ = query(collection(db, "roles"));
+    const snapshot = await getDocs(roleQ);
+
+    const roles = new Set<string>();
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.name?.trim()) {
+        roles.add(capitalizeEachWord(data.name));
+      }
+    });
+
+    setExistingRoles(Array.from(roles).sort());
+  };
+
   useEffect(() => {
-    const fetchRoles = async () => {
-      const q = query(collection(db, "members"), orderBy("createdAt", "desc"));
-      const snapshot = await getDocs(q);
-
-      const roles = new Set<string>();
-
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.role?.trim()) {
-          roles.add(capitalizeEachWord(data.role));
-        }
-      });
-
-      setExistingRoles(Array.from(roles).sort());
-    };
-
     fetchRoles();
   }, []);
 
+  // CREATE MEMBER
   const handleSubmit = async () => {
     if (!name.trim()) return;
 
@@ -84,6 +104,8 @@ export default function AddMember({ member }: AddMemberProps) {
           role: role.trim() || "",
           updatedAt: serverTimestamp(),
         });
+
+        showToast("success", "Member updated successfully");
       } else {
         await addDoc(collection(db, "members"), {
           name: name.trim(),
@@ -97,10 +119,34 @@ export default function AddMember({ member }: AddMemberProps) {
         setImageFile(null);
         setMetadata("");
         setRole("");
+
+        showToast("success", "Member added successfully");
       }
+    } catch (err) {
+      showToast("error", "Something went wrong");
     } finally {
       setLoading(false);
     }
+  };
+
+  // CREATE ROLE (MODAL)
+  const handleCreateRole = async () => {
+    if (!newRole.trim()) return;
+
+    const formatted = capitalizeEachWord(newRole);
+
+    await addDoc(collection(db, "roles"), {
+      name: formatted,
+      createdAt: serverTimestamp(),
+    });
+
+    setRole(formatted);
+    setNewRole("");
+    setRoleModalOpen(false);
+
+    await fetchRoles();
+
+    showToast("success", `Role "${formatted}" created`);
   };
 
   return (
@@ -112,9 +158,97 @@ export default function AddMember({ member }: AddMemberProps) {
       shadow-2xl
       p-6 md:p-8
       space-y-6
+      relative
     ">
 
-      {/* TITLE (optional but consistent) */}
+      {/* TOAST */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className={`
+              fixed bottom-6 right-6 z-50
+              px-4 py-3 rounded-xl shadow-xl
+              text-white text-sm font-medium
+              backdrop-blur-md border
+              ${
+                toast.type === "success"
+                  ? "bg-green-500/20 border-green-400"
+                  : toast.type === "error"
+                  ? "bg-red-500/20 border-red-400"
+                  : "bg-blue-500/20 border-blue-400"
+              }
+            `}
+          >
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ROLE MODAL */}
+      <AnimatePresence>
+        {roleModalOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="
+                w-[90%] max-w-md
+                bg-[#0F172A]
+                border border-[#334155]
+                rounded-2xl
+                p-6 space-y-4
+              "
+            >
+              <h2 className="text-white text-lg font-bold">
+                Create New Role
+              </h2>
+
+              <input
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value)}
+                placeholder="Enter role name..."
+                className="
+                  w-full p-3 rounded-lg
+                  bg-[#1E293B]
+                  text-white
+                  border border-[#334155]
+                  outline-none
+                "
+              />
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setRoleModalOpen(false)}
+                  className="px-4 py-2 text-sm text-gray-300"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleCreateRole}
+                  className="
+                    px-4 py-2 rounded-lg text-white text-sm
+                    bg-gradient-to-r from-[#2563EB] to-[#1D4ED8]
+                  "
+                >
+                  Save Role
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* HEADER */}
       <div className="border-b border-[#334155] pb-4">
         <h2 className="text-2xl font-bold text-white">
           {member ? "Edit Member" : "Add New Member"}
@@ -132,15 +266,11 @@ export default function AddMember({ member }: AddMemberProps) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Enter full name"
           className="
             w-full p-3 rounded-lg
             bg-[#1E293B]/60 text-white
             border border-[#334155]
-            focus:border-[#60A5FA]
-            focus:ring-2 focus:ring-[#60A5FA]/20
             outline-none
-            transition-all
           "
         />
       </div>
@@ -148,80 +278,52 @@ export default function AddMember({ member }: AddMemberProps) {
       {/* ROLE */}
       <div>
         <label className="block mb-2 text-sm font-semibold text-[#60A5FA]">
-          Role <span className="text-gray-400 text-xs">(Optional)</span>
+          Role
         </label>
 
         <select
           value={role}
-          onChange={(e) => {
-            if (e.target.value === "new") {
-              const r = prompt("Enter new role:");
-              if (r) setRole(capitalizeEachWord(r));
-            } else {
-              setRole(e.target.value);
-            }
-          }}
+          onChange={(e) => setRole(e.target.value)}
           className="
             w-full p-3 rounded-lg
             bg-[#1E293B]/60 text-white
             border border-[#334155]
-            focus:border-[#60A5FA]
-            focus:ring-2 focus:ring-[#60A5FA]/20
             outline-none
           "
         >
           <option value="">Select role</option>
           {existingRoles.map((r) => (
-            <option key={r} value={r}>{r}</option>
+            <option key={r} value={r}>
+              {r}
+            </option>
           ))}
-          <option value="new">+ Add new role</option>
         </select>
+
+        <button
+          onClick={() => setRoleModalOpen(true)}
+          className="mt-2 text-sm text-[#60A5FA] hover:underline"
+        >
+          + Add new role
+        </button>
       </div>
 
       {/* IMAGE */}
-      <div>
-        <label className="block mb-2 text-sm font-semibold text-[#60A5FA]">
-          Image
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-          className="
-            w-full text-sm text-gray-300
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-lg file:border-0
-            file:bg-[#60A5FA] file:text-white
-            file:hover:bg-[#93C5FD]
-            cursor-pointer
-          "
-        />
-      </div>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+      />
 
       {/* METADATA */}
-      <div>
-        <label className="block mb-2 text-sm font-semibold text-[#60A5FA]">
-          Details
-        </label>
-        <div className="
-          border border-[#334155]
-          rounded-lg overflow-hidden
-          bg-[#1E293B]/60
-        ">
-          <RichTextEditor value={metadata} onChange={setMetadata} />
-        </div>
-      </div>
+      <RichTextEditor value={metadata} onChange={setMetadata} />
 
       {/* BUTTON */}
       <button
         onClick={handleSubmit}
         disabled={loading}
         className="
-          w-full py-3 rounded-lg font-bold text-white
+          w-full py-3 rounded-lg text-white font-bold
           bg-gradient-to-r from-[#2563EB] to-[#1D4ED8]
-          hover:shadow-2xl hover:scale-[1.02]
-          transition-all duration-300
-          disabled:opacity-50
         "
       >
         {loading ? "Saving..." : member ? "Update Member" : "Add Member"}

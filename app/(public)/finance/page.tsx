@@ -9,8 +9,6 @@ import FinanceForm, { FinanceFormSubmitPayload } from "@/components/FinanceForm"
 import { useFinanceRealtimeData } from "@/hooks/useFinanceRealtimeData";
 import { db } from "@/lib/firebase";
 
-const TOTAL_STEPS = 7;
-
 export default function FinancePage() {
   const router = useRouter();
   const { conferences, regions, churches, categories, loading, error } = useFinanceRealtimeData({
@@ -37,13 +35,19 @@ export default function FinancePage() {
 
   const stepLabel = useMemo(() => {
     if (step === 1) return "Welcome";
-    if (step === 2) return "Donor Type";
+    if (step === 2) return "Identity";
     if (step === 3) return "Contribution Form";
     if (step === 4) return "Amount";
     if (step === 5) return "Personal Details";
-    if (step === 6) return "Church Details";
+    // For members only
+    if (step === 6 && formData.donorType === "member") return "Church Details";
     return "Final Review";
-  }, [step]);
+  }, [step, formData.donorType]);
+
+  // Calculate total steps based on donor type
+  const totalSteps = useMemo(() => {
+    return formData.donorType === "visitor" ? 6 : 7;
+  }, [formData.donorType]);
 
   const onFormChange = (patch: Partial<FinanceFormSubmitPayload>) => {
     setStepError(null);
@@ -71,15 +75,26 @@ export default function FinancePage() {
     if (!canProceedFromStep(step)) return;
 
     setStep((current) => {
-      if (current === 5 && formData.donorType === "visitor") return 7;
-      return Math.min(TOTAL_STEPS, current + 1);
+      // For visitors: skip step 6 (church details)
+      if (formData.donorType === "visitor") {
+        if (current === 5) return 6; // Go directly to final review
+        return Math.min(totalSteps, current + 1);
+      }
+      
+      // For members: normal flow
+      return Math.min(totalSteps, current + 1);
     });
   };
 
   const previousStep = () => {
     setStepError(null);
     setStep((current) => {
-      if (current === 7 && formData.donorType === "visitor") return 5;
+      // For visitors: no step 6 to worry about
+      if (formData.donorType === "visitor") {
+        return Math.max(1, current - 1);
+      }
+      
+      // For members: normal flow
       return Math.max(1, current - 1);
     });
   };
@@ -89,6 +104,7 @@ export default function FinancePage() {
     setFormData((prev) => ({
       ...prev,
       donorType,
+      // Clear all church-related fields for visitors
       conferenceId: donorType === "visitor" ? undefined : prev.conferenceId,
       regionId: donorType === "visitor" ? undefined : prev.regionId,
       churchId: donorType === "visitor" ? undefined : prev.churchId,
@@ -111,6 +127,7 @@ export default function FinancePage() {
         categoryId: formData.categoryId,
         type: formData.type || selectedCategory?.type || "donation",
         purpose: formData.purpose || null,
+        // Only include church data for members
         conferenceId: formData.donorType === "member" ? formData.conferenceId || null : null,
         regionId: formData.donorType === "member" ? formData.regionId || null : null,
         churchId: formData.donorType === "member" ? formData.churchId || null : null,
@@ -167,12 +184,15 @@ export default function FinancePage() {
           <div className="space-y-6">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-slate-300">
-                <span>Step {step} of {TOTAL_STEPS}</span>
+                <span>Step {step} of {totalSteps}</span>
                 <span>{stepLabel}</span>
               </div>
               <div className="flex gap-2">
-                {[1, 2, 3, 4, 5, 6, 7].map((entry) => (
-                  <div key={entry} className={`h-2 flex-1 rounded-full ${step >= entry ? "bg-cyan-500" : "bg-white/10"}`} />
+                {Array.from({ length: totalSteps }, (_, i) => i + 1).map((entry) => (
+                  <div 
+                    key={entry} 
+                    className={`h-2 flex-1 rounded-full ${step >= entry ? "bg-cyan-500" : "bg-white/10"}`} 
+                  />
                 ))}
               </div>
             </div>
@@ -232,7 +252,7 @@ export default function FinancePage() {
                     <p>Name: {formData.name || "-"}</p>
                     <p>Phone: {formData.phone || "-"}</p>
                     <p>Email: {formData.email || "-"}</p>
-                    <p>Type: {formData.donorType || "-"}</p>
+                    <p>Identity: {formData.donorType === "member" ? "Church Member" : "Visitor"}</p>
                   </div>
                   <div className="flex justify-between mt-6">
                     <Back onClick={previousStep} />
@@ -241,6 +261,7 @@ export default function FinancePage() {
                 </Card>
               )}
 
+              {/* Church Details - ONLY for members */}
               {step === 6 && formData.donorType === "member" && (
                 <Card title="Church Details">
                   <div className="space-y-2 text-slate-200">
@@ -253,18 +274,23 @@ export default function FinancePage() {
                 </Card>
               )}
 
-              {step === 7 && (
+              {/* Final Review - Different content for visitors vs members */}
+              {step === totalSteps && (
                 <Card title="Final Review">
                   <div className="space-y-3 text-slate-200 text-sm">
                     <p>
                       Confirm the paying of {selectedCategory?.title?.toLowerCase() || "contribution"} of amount KES{" "}
                       {(formData.amount || 0).toLocaleString("en-KE")} to OLD SDA Organization.
                     </p>
-                    <p className="font-semibold">Your details</p>
+                    <p className="font-semibold mt-4">Your details</p>
                     <p>Name: {formData.name || "-"}</p>
                     <p>Phone: {formData.phone || "-"}</p>
                     <p>Email: {formData.email || "-"}</p>
-                    <p>Church: {formData.donorType === "visitor" ? "Visitor / Other" : selectedChurch?.name || "-"}</p>
+                    <p>Donor Type: {formData.donorType === "member" ? "Church Member" : "Visitor"}</p>
+                    {/* Only show church for members */}
+                    {formData.donorType === "member" && (
+                      <p>Church: {selectedChurch?.name || "Not selected"}</p>
+                    )}
                     <p>Amount: KES {(formData.amount || 0).toLocaleString("en-KE")}</p>
                   </div>
 
@@ -274,9 +300,9 @@ export default function FinancePage() {
                       type="button"
                       onClick={submitFinal}
                       disabled={submitting}
-                      className="bg-cyan-500 px-6 py-2 rounded-lg disabled:opacity-60"
+                      className="bg-cyan-500 px-6 py-2 rounded-lg disabled:opacity-60 hover:bg-cyan-600 transition-colors"
                     >
-                      {submitting ? "Submitting..." : "Submit"}
+                      {submitting ? "Submitting..." : "Submit Contribution"}
                     </button>
                   </div>
                 </Card>
@@ -307,7 +333,7 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
 
 function Next({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="bg-cyan-500 text-white px-5 py-2 rounded-lg mt-6">
+    <button type="button" onClick={onClick} className="bg-cyan-500 text-white px-5 py-2 rounded-lg mt-6 hover:bg-cyan-600 transition-colors">
       Next
     </button>
   );
@@ -315,7 +341,7 @@ function Next({ onClick }: { onClick: () => void }) {
 
 function Back({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="text-slate-300">
+    <button type="button" onClick={onClick} className="text-slate-300 hover:text-white transition-colors">
       Back
     </button>
   );
@@ -323,7 +349,7 @@ function Back({ onClick }: { onClick: () => void }) {
 
 function ActionBtn({ children, onClick }: { children: ReactNode; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="bg-white text-black px-5 py-2 rounded-lg">
+    <button type="button" onClick={onClick} className="bg-white text-black px-5 py-2 rounded-lg hover:bg-gray-100 transition-colors">
       {children}
     </button>
   );

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import AboutPreview from "@/components/public/AboutPreview";
 
 /* ================= COMPONENTS ================= */
 import Hero from "@/components/public/HeroBanner";
@@ -59,7 +60,7 @@ export default function HomePage() {
 
           </div>
         </section>
-
+<AboutPreview />
         {/* ================= BLOG ================= */}
         <section className="py-14 px-4 sm:px-6 lg:px-8 bg-[#0F172A]">
           <div className="max-w-6xl mx-auto">

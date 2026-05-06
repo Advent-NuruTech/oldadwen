@@ -205,7 +205,7 @@ export default function FinanceTransactionsView() {
           </label>
 
           <FilterSelect
-            label="Donor Type"
+            label="Identity"
             value={filters.donorType}
             onChange={(value) => setFilter("donorType", value as "all" | "member" | "visitor")}
             options={["all", "member", "visitor"]}

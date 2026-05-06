@@ -17,6 +17,7 @@ interface Member {
   imageUrl: string;
   metadata: string;
   description?: string;
+  role?: string; // Add role field
 }
 
 interface Blog {
@@ -252,6 +253,9 @@ const handleBlogClick = (blogId: string) => {
     </div>
   );
 
+  // Determine the role text - if role exists, show it, otherwise show "Team Member"
+  const roleText = member.role && member.role.trim() !== "" ? member.role : "Team Member";
+
   return (
     <>
       {/* Deep blue gradient background matching blog page */}
@@ -300,7 +304,6 @@ const handleBlogClick = (blogId: string) => {
             {member.name}
           </h1>
 
-
           {/* Author & Role section - matching blog author box */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-t border-b border-[#334155]">
             <div className="flex items-center gap-4">
@@ -313,14 +316,13 @@ const handleBlogClick = (blogId: string) => {
                 </div>
               </div>
               <div>
-                <p className="font-semibold text-white">Team Member</p>
+                {/* Role display - shows role if exists, otherwise "Team Member" */}
+                <p className="font-semibold text-white">{roleText}</p>
                 <p className="text-sm text-gray-400">
                   {memberBlogs.length} article{memberBlogs.length !== 1 ? 's' : ''} published
                 </p>
               </div>
             </div>
-            
-            
           </div>
         </div>
 
@@ -482,62 +484,68 @@ const handleBlogClick = (blogId: string) => {
               </div>
 
               <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {otherMembers.map((m, index) => (
-                  <motion.div
-                    key={m.id}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.15, duration: 0.5, ease: "easeOut" }}
-                    className="group cursor-pointer rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl bg-[#1E293B]/40 border border-[#334155] backdrop-blur-sm"
-                  >
-                    {/* Image section - only shows when imageUrl exists */}
-                    {m.imageUrl && (
-                      <div className="relative h-48 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E27] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
-                        <img
-                          src={m.imageUrl}
-                          alt={m.name}
-                          className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700 p-4"
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                        <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-[#0A0E27]/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                          <svg className="w-5 h-5 text-[#60A5FA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                          </svg>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className={`p-6 ${!m.imageUrl ? 'pt-6' : ''}`}>
-                      <div className="w-12 h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] mb-4 rounded-full"></div>
-                      <h3 className="font-bold text-xl mb-3 text-white group-hover:text-[#60A5FA] transition-colors line-clamp-2">
-                        {m.name}
-                      </h3>
-                      <p className="text-gray-400 text-sm mb-5 line-clamp-3 leading-relaxed">
-                        {m.description && m.description.length > 0
-                          ? getExcerpt(m.description, 20)
-                          : getExcerpt(stripHtml(m.metadata), 20)}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">{m.name.charAt(0).toUpperCase()}</span>
+                {otherMembers.map((m, index) => {
+                  // Determine role text for other members
+                  const otherMemberRoleText = m.role && m.role.trim() !== "" ? m.role : "Team Member";
+                  
+                  return (
+                    <motion.div
+                      key={m.id}
+                      initial={{ opacity: 0, y: 50 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.15, duration: 0.5, ease: "easeOut" }}
+                      className="group cursor-pointer rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl bg-[#1E293B]/40 border border-[#334155] backdrop-blur-sm"
+                    >
+                      {/* Image section - only shows when imageUrl exists */}
+                      {m.imageUrl && (
+                        <div className="relative h-48 overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E27] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                          <img
+                            src={m.imageUrl}
+                            alt={m.name}
+                            className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700 p-4"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                          <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-[#0A0E27]/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                            <svg className="w-5 h-5 text-[#60A5FA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
                           </div>
-                          <span className="text-xs text-gray-500">Team Member</span>
                         </div>
-                        <Link
-                          href={`/members/${m.id}`}
-                          className="text-sm font-medium text-[#60A5FA] group-hover:text-[#93C5FD] group-hover:translate-x-1 transition-all duration-300"
-                        >
-                          View Profile →
-                        </Link>
+                      )}
+                      
+                      <div className={`p-6 ${!m.imageUrl ? 'pt-6' : ''}`}>
+                        <div className="w-12 h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] mb-4 rounded-full"></div>
+                        <h3 className="font-bold text-xl mb-3 text-white group-hover:text-[#60A5FA] transition-colors line-clamp-2">
+                          {m.name}
+                        </h3>
+                        <p className="text-gray-400 text-sm mb-5 line-clamp-3 leading-relaxed">
+                          {m.description && m.description.length > 0
+                            ? getExcerpt(m.description, 20)
+                            : getExcerpt(stripHtml(m.metadata), 20)}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] flex items-center justify-center">
+                              <span className="text-xs font-bold text-white">{m.name.charAt(0).toUpperCase()}</span>
+                            </div>
+                            {/* Role display for other members - shows role if exists, otherwise "Team Member" */}
+                            <span className="text-xs text-gray-500">{otherMemberRoleText}</span>
+                          </div>
+                          <Link
+                            href={`/members/${m.id}`}
+                            className="text-sm font-medium text-[#60A5FA] group-hover:text-[#93C5FD] group-hover:translate-x-1 transition-all duration-300"
+                          >
+                            View Profile →
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
             </section>
           )}

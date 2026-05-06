@@ -112,7 +112,8 @@ In 2018, after a powerful convention at Ranen Lwala SDA Church, Ranen Conference
           dark={false}
           reverse
           title="2019 – Public Witness & First Trials"
-          image="https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778099010/14_cbos1f.jpg"
+          
           text={`In 2019 we began preaching openly and holding public missions. The Kanyadoto Mission 2019 resulted in the opening of Amazing Grace SDA Church. We are sorry to say the General Conference, which holds to the Trinity, later took the church from us.
 
 It was during the Embu Campmeeting 2019 that Bro. Alvin Ogaga and Bro. Erick Leo were baptized into the One True God by Pastor Daniel Mesa of USA.`}
@@ -121,7 +122,7 @@ It was during the Embu Campmeeting 2019 that Bro. Alvin Ogaga and Bro. Erick Leo
         <Section
           dark={true}
           title="2020 – Separation, Home Churches & First Baptisms"
-          image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778081747/8_vvllm7.jpg"
           text={`January 2020: The first believers to separate and worship in their homes were Bro. Erick Leo of Ranen, Bro. Jefferson Oluoch, and Bro. Bernard Odhiambo.
 
 February 2020: COVID-19 entered Kenya. With all General Conference churches closed, this became a milestone for full separation. We promoted worship in homes, forests, and by rivers, teaching the Three Angels' Messages and standing firmly on the 1872 and 1889 Fundamental Principles of the old SDA Church.
@@ -137,7 +138,7 @@ December 2020: Ramoya Mission was held. We are sorry to say the GC took over and
           dark={false}
           reverse
           title="2021 – No Collaboration: Campmeetings & Church Organization"
-          image="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778081697/4_mhotjc.jpg"
           text={`In 2021 we made a solemn decision: no collaboration with any Trinitarian church. We would hold our own campmeetings, missions, and trainings as One True God believers.
 
 July 2021 – Rongo Campmeeting at Sawayume Grounds
@@ -172,7 +173,7 @@ Key Pioneers: Ev. Maxwell Okoth, Erick Leo, Alvin Ogaga, and Emmanuel Juma led t
         <Section
           dark={true}
           title="2022 – Persecution, Ordination & Conference Organization"
-          image="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778100108/images_gzohdc.jpg"
           text={`February 2022: First Old SDA Revival Week of Prayer held between Rongo and Nandi larger churches. Speakers exchanged: Maxwell Okoth went to Nandi, Emmanuel Juma to Rongo.
 
 Persecution for Faith: Brethren were arrested in Nandi and Rongo for separation from the apostate SDA church and for accepting true education. Those arrested and charged include: Ev. Maxwell Okoth – arrested twice, escaped twice; Usher Jeffrey – whereabouts unknown; Charles Ogolla – no longer Old SDA; Ruth Omingo; Veldah Verah; Elias Ondoro; the late John Rugut; Zaddock Omollo; Ruth Chelagat. All were sponsored by enemies of truth.
@@ -210,7 +211,7 @@ Focus Areas Agreed: More missions, medical missionary work, true education schoo
           dark={false}
           reverse
           title="2022 to Present – Growth & Mission"
-          image="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778081882/11_wew2bd.jpg"
           text={`From 2022 until now, organization has helped us:
 1. Maintain church property and open new churches in and beyond our borders: Nairobi City, Weitethie Thika, Lusigeti Kikuyu, Thogoto Kikuyu, Soy Kakamega, Bungoma, Eldoret, Malindi, Uganda, Tanzania, South Sudan, among many others.
 2. Baptisms: Over 800 souls baptized into the One True God. More than 900 are currently under instruction for baptism.
@@ -226,7 +227,7 @@ January 2023: United with other like-minded regions in Kenya and formed the Larg
         <Section
           dark={true}
           title="What We Believe"
-          image="https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778099931/download_yuoymt.jpg"
           text={`We remain steadfast in the Bible and the Spirit of Prophecy as manifested in the writings of Ellen G. White.
 
 1. Scripture: We accept the whole Bible as inspired. We do not reject portions of Scripture.
@@ -243,7 +244,7 @@ January 2023: United with other like-minded regions in Kenya and formed the Larg
           dark={false}
           reverse
           title="Our Mission Today"
-          image="https://images.unsplash.com/photo-1446057032654-9d8885db76c6?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778081717/5_gpv027.jpg"
           text={`1. Preach the Three Angels' Messages of Revelation 14:6-12 in their pioneer purity.
 2. Call God's people out of Babylon and back to the "old paths." Jeremiah 6:16
 3. Expose Jesuit infiltration that has changed Fundamental Principles to Fundamental Beliefs, introduced the Trinity, and altered the symbols of Adventism.
