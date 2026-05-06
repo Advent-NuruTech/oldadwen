@@ -2,6 +2,7 @@
 export type DonorType = "member" | "visitor";
 export type TransactionStatus = "pending" | "confirmed";
 export type TransactionSource = "online" | "manual";
+export type NotificationStatus = "unread" | "read";
 
 export interface ConferenceRecord {
   id: string;
@@ -85,6 +86,29 @@ export interface ReceiptRecord {
   createdAt?: Date | null;
   confirmedAt?: Date | null;
   pdfUrl?: string;
+}
+
+export interface PaymentMethodRecord {
+  id: string;
+  label: string;
+  paybillNumber?: string;
+  accountNumber?: string;
+  phoneNumber?: string;
+  isActive: boolean;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+}
+
+export interface FinanceNotificationRecord {
+  id: string;
+  transactionId: string;
+  donorName?: string;
+  amount: number;
+  categoryId?: string;
+  type: FinanceType;
+  status: NotificationStatus;
+  createdAt?: Date | null;
+  readAt?: Date | null;
 }
 
 export interface DateRange {

@@ -5,10 +5,11 @@ import { FinanceTransactionRecord } from "@/lib/financeTypes";
 interface TransactionTableProps {
   transactions: FinanceTransactionRecord[];
   resolveLabel: (transaction: FinanceTransactionRecord) => string;
+  resolveCategory?: (transaction: FinanceTransactionRecord) => string;
   onConfirm: (transaction: FinanceTransactionRecord) => Promise<void>;
 }
 
-export default function TransactionTable({ transactions, resolveLabel, onConfirm }: TransactionTableProps) {
+export default function TransactionTable({ transactions, resolveLabel, resolveCategory, onConfirm }: TransactionTableProps) {
   if (transactions.length === 0) return null;
 
   return (
@@ -18,6 +19,7 @@ export default function TransactionTable({ transactions, resolveLabel, onConfirm
           <tr>
             <th className="px-4 py-3">Name</th>
             <th className="px-4 py-3">Church</th>
+            <th className="px-4 py-3">Category</th>
             <th className="px-4 py-3">Type</th>
             <th className="px-4 py-3">Amount</th>
             <th className="px-4 py-3">Status</th>
@@ -31,6 +33,7 @@ export default function TransactionTable({ transactions, resolveLabel, onConfirm
             <tr key={transaction.id} className="border-t border-slate-200">
               <td className="px-4 py-3">{transaction.name || "Anonymous"}</td>
               <td className="px-4 py-3">{resolveLabel(transaction)}</td>
+              <td className="px-4 py-3">{resolveCategory ? resolveCategory(transaction) : transaction.categoryId || "-"}</td>
               <td className="px-4 py-3 uppercase">{transaction.type}</td>
               <td className="px-4 py-3">KES {transaction.amount.toLocaleString("en-KE")}</td>
               <td className="px-4 py-3">

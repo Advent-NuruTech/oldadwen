@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 
@@ -6,7 +6,7 @@ import { useFinanceRealtimeData } from "@/hooks/useFinanceRealtimeData";
 import { summarizeTransactions } from "@/lib/financeEngine";
 
 export default function FinanceDashboardView() {
-  const { transactions, churches, regions, conferences, loading, error } = useFinanceRealtimeData();
+  const { transactions, churches, regions, conferences, loading, error } = useFinanceRealtimeData({ includeReceipts: false });
 
   const confirmed = useMemo(() => transactions.filter((tx) => tx.status === "confirmed"), [transactions]);
   const summary = useMemo(() => summarizeTransactions(confirmed), [confirmed]);
@@ -156,3 +156,4 @@ function SimpleTable({ headers, rows }: { headers: string[]; rows: string[][] })
 function currency(value: number): string {
   return `KES ${value.toLocaleString("en-KE")}`;
 }
+

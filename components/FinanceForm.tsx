@@ -1,14 +1,20 @@
-﻿"use client";
+"use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import StructureSelector from "@/components/StructureSelector";
-import { ChurchRecord, ConferenceRecord, FinanceCategoryRecord, FinanceType, RegionRecord } from "@/lib/financeTypes";
+import {
+  ChurchRecord,
+  ConferenceRecord,
+  FinanceCategoryRecord,
+  FinanceType,
+  RegionRecord,
+} from "@/lib/financeTypes";
 
 export interface FinanceFormSubmitPayload {
   amount: number;
   categoryId: string;
-  type: FinanceType;
+  type?: FinanceType;
   purpose?: string;
 
   conferenceId?: string;
@@ -27,8 +33,9 @@ interface FinanceFormProps {
   regions: RegionRecord[];
   churches: ChurchRecord[];
   categories: FinanceCategoryRecord[];
-  onSubmit: (payload: FinanceFormSubmitPayload) => Promise<void>;
-  submitting?: boolean;
+  donorType: "member" | "visitor";
+  value: Partial<FinanceFormSubmitPayload>;
+  onChange: (patch: Partial<FinanceFormSubmitPayload>) => void;
 }
 
 export default function FinanceForm({
@@ -36,200 +43,122 @@ export default function FinanceForm({
   regions,
   churches,
   categories,
-  onSubmit,
-  submitting = false,
+  donorType,
+  value,
+  onChange,
 }: FinanceFormProps) {
-  const [conferenceId, setConferenceId] = useState("");
-  const [regionId, setRegionId] = useState("");
-  const [churchId, setChurchId] = useState("");
-  const [isVisitor, setIsVisitor] = useState(false);
-
-  const [categoryId, setCategoryId] = useState("");
-  const [amount, setAmount] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
   const filteredRegions = useMemo(
-    () => regions.filter((region) => region.conferenceId === conferenceId),
-    [regions, conferenceId],
+    () => regions.filter((entry) => entry.conferenceId === (value.conferenceId || "")),
+    [regions, value.conferenceId],
   );
 
   const filteredChurches = useMemo(
-    () => churches.filter((church) => church.regionId === regionId && church.isActive),
-    [churches, regionId],
+    () => churches.filter((entry) => entry.regionId === (value.regionId || "") && entry.isActive),
+    [churches, value.regionId],
   );
 
-  const orderedCategories = useMemo(() => {
-    return [...categories]
-      .filter((category) => category.isActive && category.isPublic)
-      .sort((a, b) => {
-        if (a.type === "campaign" && b.type !== "campaign") return -1;
-        if (a.type !== "campaign" && b.type === "campaign") return 1;
-        return a.priority - b.priority;
-      });
-  }, [categories]);
+  const orderedCategories = useMemo(
+    () =>
+      [...categories]
+        .filter((entry) => entry.isActive && entry.isPublic)
+        .sort((a, b) => {
+          if (a.type === "campaign" && b.type !== "campaign") return -1;
+          if (a.type !== "campaign" && b.type === "campaign") return 1;
+          return a.priority - b.priority;
+        }),
+    [categories],
+  );
 
-  const selectedCategory = orderedCategories.find((category) => category.id === categoryId);
-
-  const handleConferenceChange = (value: string) => {
-    setConferenceId(value);
-    setRegionId("");
-    setChurchId("");
-  };
-
-  const handleRegionChange = (value: string) => {
-    setRegionId(value);
-    setChurchId("");
-  };
-
-  const handleVisitorToggle = (value: boolean) => {
-    setIsVisitor(value);
-    if (value) {
-      setConferenceId("");
-      setRegionId("");
-      setChurchId("");
-    }
-  };
-
-  const submitForm = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setError(null);
-
-    const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      setError("Amount must be greater than 0.");
-      return;
-    }
-
-    if (!categoryId || !selectedCategory) {
-      setError("Select a contribution type.");
-      return;
-    }
-
-    if (!isVisitor && (!conferenceId || !regionId || !churchId)) {
-      setError("Please select conference, region, and church.");
-      return;
-    }
-
-    await onSubmit({
-      amount: numericAmount,
-      categoryId,
-      type: selectedCategory.type,
-      purpose: purpose.trim() || undefined,
-      conferenceId: isVisitor ? undefined : conferenceId,
-      regionId: isVisitor ? undefined : regionId,
-      churchId: isVisitor ? undefined : churchId,
-      donorType: isVisitor ? "visitor" : "member",
-      name: name.trim() || undefined,
-      phone: phone.trim() || undefined,
-      email: email.trim() || undefined,
-      message: message.trim() || undefined,
-    });
-  };
+  const selectedCategory = orderedCategories.find((entry) => entry.id === value.categoryId);
 
   return (
-    <form onSubmit={submitForm} className="space-y-5">
+    <div className="space-y-6">
       <StructureSelector
         conferences={conferences}
         regions={filteredRegions}
         churches={filteredChurches}
-        conferenceId={conferenceId}
-        regionId={regionId}
-        churchId={churchId}
-        isVisitor={isVisitor}
-        onConferenceChange={handleConferenceChange}
-        onRegionChange={handleRegionChange}
-        onChurchChange={setChurchId}
-        onVisitorToggle={handleVisitorToggle}
+        conferenceId={value.conferenceId || ""}
+        regionId={value.regionId || ""}
+        churchId={value.churchId || ""}
+        donorType={donorType}
+        onConferenceChange={(conferenceId) => onChange({ conferenceId, regionId: "", churchId: "", donorType })}
+        onRegionChange={(regionId) => onChange({ regionId, churchId: "", donorType })}
+        onChurchChange={(churchId) => onChange({ churchId, donorType })}
       />
 
-      {orderedCategories.length > 0 && (
-        <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
-          <h3 className="text-lg font-semibold text-slate-900">Contribution Type</h3>
-          <label className="block text-sm font-medium text-slate-700">
-            <span>Category</span>
-            <select
-              value={categoryId}
-              onChange={(event) => setCategoryId(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-            >
-              <option value="">Select Category</option>
-              {orderedCategories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.title}
-                </option>
-              ))}
-            </select>
-          </label>
+      <section className="bg-white rounded-2xl p-5 border border-slate-200">
+        <h3 className="font-semibold text-slate-900">Contribution Type</h3>
 
-          {(selectedCategory?.type === "donation" || selectedCategory?.type === "campaign") && (
-            <label className="block text-sm font-medium text-slate-700">
-              <span>Purpose (optional)</span>
-              <input
-                value={purpose}
-                onChange={(event) => setPurpose(event.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              />
-            </label>
-          )}
-        </section>
-      )}
-
-      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
-        <h3 className="text-lg font-semibold text-slate-900">Contribution Details</h3>
-
-        <label className="block text-sm font-medium text-slate-700">
-          <span>Amount (KES)</span>
-          <input
-            type="number"
-            min="1"
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-            required
-          />
-        </label>
-
-        <div className="grid gap-3 md:grid-cols-2">
-          <InputField label="Name (optional)" value={name} onChange={setName} />
-          <InputField label="Phone (optional)" value={phone} onChange={setPhone} />
-          <InputField label="Email (optional)" value={email} onChange={setEmail} />
-          <InputField label="Message (optional)" value={message} onChange={setMessage} />
-        </div>
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+        <select
+          value={value.categoryId || ""}
+          onChange={(event) => {
+            const categoryId = event.target.value;
+            const category = orderedCategories.find((entry) => entry.id === categoryId);
+            onChange({ categoryId, type: category?.type, donorType });
+          }}
+          className="w-full mt-3 border rounded-lg p-2"
         >
-          {submitting ? "Submitting..." : "Submit Contribution"}
-        </button>
+          <option value="">Select Type</option>
+          {orderedCategories.map((entry) => (
+            <option key={entry.id} value={entry.id}>
+              {entry.title}
+            </option>
+          ))}
+        </select>
+
+        {(selectedCategory?.type === "campaign" || selectedCategory?.type === "donation") && (
+          <input
+            placeholder="Purpose (optional)"
+            value={value.purpose || ""}
+            onChange={(event) => onChange({ purpose: event.target.value, donorType })}
+            className="w-full mt-3 border rounded-lg p-2"
+          />
+        )}
       </section>
-    </form>
-  );
-}
 
-interface InputFieldProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}
+      <section className="bg-white rounded-2xl p-5 border border-slate-200">
+        <h3 className="font-semibold text-slate-900">Amount (required)</h3>
 
-function InputField({ label, value, onChange }: InputFieldProps) {
-  return (
-    <label className="block text-sm font-medium text-slate-700">
-      <span>{label}</span>
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-      />
-    </label>
+        <input
+          type="number"
+          min={1}
+          value={value.amount ? String(value.amount) : ""}
+          onChange={(event) => onChange({ amount: Number(event.target.value), donorType })}
+          className="w-full mt-3 border rounded-lg p-2"
+          placeholder="Enter amount"
+        />
+      </section>
+
+      <section className="bg-white rounded-2xl p-5 border border-slate-200">
+        <h3 className="font-semibold text-slate-900">Personal Details (optional)</h3>
+
+        <div className="grid md:grid-cols-2 gap-3 mt-3">
+          <input
+            placeholder="Name"
+            value={value.name || ""}
+            onChange={(event) => onChange({ name: event.target.value, donorType })}
+            className="border p-2 rounded-lg"
+          />
+          <input
+            placeholder="Phone"
+            value={value.phone || ""}
+            onChange={(event) => onChange({ phone: event.target.value, donorType })}
+            className="border p-2 rounded-lg"
+          />
+          <input
+            placeholder="Email"
+            value={value.email || ""}
+            onChange={(event) => onChange({ email: event.target.value, donorType })}
+            className="border p-2 rounded-lg"
+          />
+          <input
+            placeholder="Message"
+            value={value.message || ""}
+            onChange={(event) => onChange({ message: event.target.value, donorType })}
+            className="border p-2 rounded-lg"
+          />
+        </div>
+      </section>
+    </div>
   );
 }

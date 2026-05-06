@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 
@@ -6,7 +6,7 @@ import { useFinanceRealtimeData } from "@/hooks/useFinanceRealtimeData";
 import { buildFinancePdf, downloadPdfReport, ReportScope } from "@/lib/pdfGenerator";
 
 export default function FinanceReportsView() {
-  const { conferences, regions, churches, transactions } = useFinanceRealtimeData();
+  const { conferences, regions, churches, transactions } = useFinanceRealtimeData({ includeReceipts: false });
 
   const [scope, setScope] = useState<ReportScope>("annual");
   const [conferenceId, setConferenceId] = useState("");
@@ -203,3 +203,4 @@ function FilterSelect({
 function format(value: number): string {
   return `KES ${value.toLocaleString("en-KE")}`;
 }
+

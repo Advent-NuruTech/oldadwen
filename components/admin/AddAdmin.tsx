@@ -40,7 +40,7 @@ export default function AddAdmin() {
       // HTML formatted email message
       const htmlMessage = `
 <p><strong>Congratulations ${firstName}!</strong></p>
-<p>You have been added as an administrator for <strong>Gospel Sounders Publications and Missions</strong>.</p>
+<p>You have been added as an administrator for <strong>Old SDA Organization</strong>.</p>
 <p>Your administrator account has been created successfully.</p>
 <br/>
 <p><strong>Login Details:</strong></p>
@@ -139,7 +139,7 @@ export default function AddAdmin() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">Add New Admin</h2>
-                <p className="text-gray-600 text-sm">Create administrator account for Gospel Sounders</p>
+                <p className="text-gray-600 text-sm">Create administrator account for Old SDA Organization </p>
               </div>
             </div>
           </div>

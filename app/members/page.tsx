@@ -55,10 +55,10 @@ export default function MembersPage() {
     <>
       {/* SEO / Attention Magnet */}
       <Head>
-        <title>Our Team | Gospel Sounders</title>
+        <title>Our Team | Old SDA Organization</title>
         <meta
           name="description"
-          content="Meet the dedicated team behind Gospel Sounders — servants committed to revealing the Father and the Son, proclaiming the everlasting gospel, and preparing a people for Christ's soon return."
+          content="Meet the dedicated team behind Old SDA Organization — servants committed to restoring the Old Adventism , proclaiming the everlasting gospel, and preparing a people for Christ's soon return."
         />
       </Head>
 

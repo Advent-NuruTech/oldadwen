@@ -4,24 +4,38 @@ import { useMemo, useState } from "react";
 
 import FinanceCategoriesView from "@/app/admin/finance/categories";
 import FinanceDashboardView from "@/app/admin/finance/dashboard";
+import FinanceNotificationsView from "@/app/admin/finance/notifications";
+import FinancePaymentMethodsView from "@/app/admin/finance/payment-methods";
 import FinanceReceiptsView from "@/app/admin/finance/receipts";
 import FinanceReportsView from "@/app/admin/finance/reports";
 import FinanceStructureView from "@/app/admin/finance/structure";
 import FinanceTransactionsView from "@/app/admin/finance/transactions";
+import { useFinanceNotifications } from "@/hooks/useFinanceNotifications";
 
-type TabKey = "dashboard" | "structure" | "transactions" | "categories" | "receipts" | "reports";
+type TabKey =
+  | "dashboard"
+  | "structure"
+  | "transactions"
+  | "categories"
+  | "payments"
+  | "notifications"
+  | "receipts"
+  | "reports";
 
 const tabs: Array<{ key: TabKey; label: string }> = [
   { key: "dashboard", label: "Dashboard" },
   { key: "structure", label: "Structure" },
   { key: "transactions", label: "Transactions" },
   { key: "categories", label: "Categories" },
+  { key: "payments", label: "Payment Methods" },
+  { key: "notifications", label: "Notifications" },
   { key: "receipts", label: "Receipts" },
   { key: "reports", label: "Reports" },
 ];
 
 export default function AdminFinancePage() {
   const [activeTab, setActiveTab] = useState<TabKey>("dashboard");
+  const { unreadCount } = useFinanceNotifications();
 
   const tabContent = useMemo(() => {
     switch (activeTab) {
@@ -33,6 +47,10 @@ export default function AdminFinancePage() {
         return <FinanceTransactionsView />;
       case "categories":
         return <FinanceCategoriesView />;
+      case "payments":
+        return <FinancePaymentMethodsView />;
+      case "notifications":
+        return <FinanceNotificationsView />;
       case "receipts":
         return <FinanceReceiptsView />;
       case "reports":
@@ -65,6 +83,11 @@ export default function AdminFinancePage() {
               }`}
             >
               {tab.label}
+              {tab.key === "notifications" && unreadCount > 0 && (
+                <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                  {unreadCount}
+                </span>
+              )}
             </button>
           ))}
         </nav>

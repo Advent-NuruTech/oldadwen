@@ -9,6 +9,7 @@ import BlogList from "@/components/public/BlogList";
 import LibraryList from "@/components/public/LibraryList";
 import { SectionTitle } from "@/components/public/SectionTitle";
 import YoutubeCarousel from "@/components/public/YoutubeCarousel";
+import TrueEducationMessage from "@/components/public/TrueEducationMessage";
 
 export default function HomePage() {
   return (
@@ -110,7 +111,7 @@ export default function HomePage() {
 
           </div>
         </section>
-
+<TrueEducationMessage />
         {/* ================= CTA ================= */}
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#020617] border-t border-cyan-500/10">
           <div className="max-w-4xl mx-auto text-center">

@@ -10,12 +10,11 @@ interface StructureSelectorProps {
   conferenceId: string;
   regionId: string;
   churchId: string;
-  isVisitor: boolean;
+  donorType: "member" | "visitor";
 
   onConferenceChange: (conferenceId: string) => void;
   onRegionChange: (regionId: string) => void;
   onChurchChange: (churchId: string) => void;
-  onVisitorToggle: (isVisitor: boolean) => void;
 }
 
 export default function StructureSelector({
@@ -25,24 +24,20 @@ export default function StructureSelector({
   conferenceId,
   regionId,
   churchId,
-  isVisitor,
+  donorType,
   onConferenceChange,
   onRegionChange,
   onChurchChange,
-  onVisitorToggle,
 }: StructureSelectorProps) {
+  const isVisitor = donorType === "visitor";
+
   return (
     <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900">Church Structure</h3>
-        <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-          <input
-            type="checkbox"
-            checked={isVisitor}
-            onChange={(event) => onVisitorToggle(event.target.checked)}
-          />
-          Visitor / Other
-        </label>
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase text-slate-700">
+          {isVisitor ? "Visitor" : "Member"}
+        </span>
       </div>
 
       {!isVisitor && (

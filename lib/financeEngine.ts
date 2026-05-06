@@ -28,6 +28,8 @@ export const FINANCE_COLLECTIONS = {
   categories: "finance_categories",
   transactions: "finance_transactions",
   receipts: "receipts",
+  paymentMethods: "payment_methods",
+  notifications: "notifications",
 } as const;
 
 const ALL_TYPES: FinanceType[] = ["tithe1", "tithe2", "offering", "donation", "campaign"];

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
@@ -14,6 +14,11 @@ import {
 } from "@/lib/financeTypes";
 import { normalizeChurch, normalizeConference, normalizeRegion } from "@/lib/hierarchyUtils";
 
+interface UseFinanceRealtimeDataOptions {
+  includeTransactions?: boolean;
+  includeReceipts?: boolean;
+}
+
 interface FinanceRealtimeData {
   conferences: ConferenceRecord[];
   regions: RegionRecord[];
@@ -25,7 +30,9 @@ interface FinanceRealtimeData {
   error: string | null;
 }
 
-export function useFinanceRealtimeData(): FinanceRealtimeData {
+export function useFinanceRealtimeData(options: UseFinanceRealtimeDataOptions = {}): FinanceRealtimeData {
+  const { includeTransactions = true, includeReceipts = true } = options;
+
   const [conferences, setConferences] = useState<ConferenceRecord[]>([]);
   const [regions, setRegions] = useState<RegionRecord[]>([]);
   const [churches, setChurches] = useState<ChurchRecord[]>([]);
@@ -37,52 +44,104 @@ export function useFinanceRealtimeData(): FinanceRealtimeData {
 
   useEffect(() => {
     const unsubs: Array<() => void> = [];
+    setLoading(true);
+    setError(null);
 
-    unsubs.push(
-      onSnapshot(query(collection(db, "conferences"), orderBy("name", "asc")), (snapshot) => {
-        setConferences(snapshot.docs.map((doc) => normalizeConference({ id: doc.id, ...doc.data() })));
-      }),
-    );
+    let pendingStreams = 4 + (includeTransactions ? 1 : 0) + (includeReceipts ? 1 : 0);
+    const completed = new Set<string>();
 
-    unsubs.push(
-      onSnapshot(query(collection(db, "regions"), orderBy("name", "asc")), (snapshot) => {
-        setRegions(snapshot.docs.map((doc) => normalizeRegion({ id: doc.id, ...doc.data() })));
-      }),
-    );
-
-    unsubs.push(
-      onSnapshot(query(collection(db, "churches"), orderBy("name", "asc")), (snapshot) => {
-        setChurches(snapshot.docs.map((doc) => normalizeChurch({ id: doc.id, ...doc.data() })));
-      }),
-    );
-
-    unsubs.push(
-      onSnapshot(query(collection(db, "finance_categories"), orderBy("priority", "asc")), (snapshot) => {
-        setCategories(snapshot.docs.map((doc) => normalizeCategory({ id: doc.id, ...doc.data() })));
-      }),
-    );
-
-    unsubs.push(
-      onSnapshot(query(collection(db, "finance_transactions"), orderBy("createdAt", "desc")), (snapshot) => {
-        setTransactions(snapshot.docs.map((doc) => normalizeTransaction({ id: doc.id, ...doc.data() })));
-      }),
-    );
-
-    unsubs.push(
-      onSnapshot(query(collection(db, "receipts"), orderBy("createdAt", "desc")), (snapshot) => {
-        setReceipts(snapshot.docs.map((doc) => normalizeReceipt({ id: doc.id, ...doc.data() })));
+    const markReady = (key: string) => {
+      if (completed.has(key)) return;
+      completed.add(key);
+      pendingStreams -= 1;
+      if (pendingStreams <= 0) {
         setLoading(false);
-        setError(null);
-      }, (snapshotError) => {
-        setError(snapshotError.message || "Failed to load finance data.");
-        setLoading(false);
-      }),
+      }
+    };
+
+    const markError = (message: string) => {
+      setError(message);
+      setLoading(false);
+    };
+
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, "conferences"), orderBy("name", "asc")),
+        (snapshot) => {
+          setConferences(snapshot.docs.map((entry) => normalizeConference({ id: entry.id, ...entry.data() })));
+          markReady("conferences");
+        },
+        (snapshotError) => markError(snapshotError.message || "Failed to load conferences."),
+      ),
     );
+
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, "regions"), orderBy("name", "asc")),
+        (snapshot) => {
+          setRegions(snapshot.docs.map((entry) => normalizeRegion({ id: entry.id, ...entry.data() })));
+          markReady("regions");
+        },
+        (snapshotError) => markError(snapshotError.message || "Failed to load regions."),
+      ),
+    );
+
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, "churches"), orderBy("name", "asc")),
+        (snapshot) => {
+          setChurches(snapshot.docs.map((entry) => normalizeChurch({ id: entry.id, ...entry.data() })));
+          markReady("churches");
+        },
+        (snapshotError) => markError(snapshotError.message || "Failed to load churches."),
+      ),
+    );
+
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, "finance_categories"), orderBy("priority", "asc")),
+        (snapshot) => {
+          setCategories(snapshot.docs.map((entry) => normalizeCategory({ id: entry.id, ...entry.data() })));
+          markReady("categories");
+        },
+        (snapshotError) => markError(snapshotError.message || "Failed to load categories."),
+      ),
+    );
+
+    if (includeTransactions) {
+      unsubs.push(
+        onSnapshot(
+          query(collection(db, "finance_transactions"), orderBy("createdAt", "desc")),
+          (snapshot) => {
+            setTransactions(snapshot.docs.map((entry) => normalizeTransaction({ id: entry.id, ...entry.data() })));
+            markReady("transactions");
+          },
+          (snapshotError) => markError(snapshotError.message || "Failed to load transactions."),
+        ),
+      );
+    } else {
+      setTransactions([]);
+    }
+
+    if (includeReceipts) {
+      unsubs.push(
+        onSnapshot(
+          query(collection(db, "receipts"), orderBy("createdAt", "desc")),
+          (snapshot) => {
+            setReceipts(snapshot.docs.map((entry) => normalizeReceipt({ id: entry.id, ...entry.data() })));
+            markReady("receipts");
+          },
+          (snapshotError) => markError(snapshotError.message || "Failed to load receipts."),
+        ),
+      );
+    } else {
+      setReceipts([]);
+    }
 
     return () => {
       unsubs.forEach((unsub) => unsub());
     };
-  }, []);
+  }, [includeTransactions, includeReceipts]);
 
   return useMemo(
     () => ({ conferences, regions, churches, categories, transactions, receipts, loading, error }),

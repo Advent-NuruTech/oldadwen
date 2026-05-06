@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 
@@ -9,7 +9,7 @@ import { useFinanceRealtimeData } from "@/hooks/useFinanceRealtimeData";
 import { ReceiptRecord } from "@/lib/financeTypes";
 
 export default function FinanceReceiptsView() {
-  const { receipts, transactions } = useFinanceRealtimeData();
+  const { receipts, transactions } = useFinanceRealtimeData({ includeTransactions: true, includeReceipts: true });
   const [generatedReceipt, setGeneratedReceipt] = useState<ReceiptRecord | null>(null);
 
   const eligible = useMemo(
@@ -57,3 +57,4 @@ export default function FinanceReceiptsView() {
     </div>
   );
 }
+

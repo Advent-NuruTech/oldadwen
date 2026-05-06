@@ -108,7 +108,7 @@ export default function AdminLogin() {
             <div className="relative w-48 h-48 mx-auto mb-6">
               <Image
                 src="/images/logo.jpeg"
-                alt="Gospel Sounders Logo"
+                alt="Old SDA Logo"
                 fill
                 className="object-contain rounded-full shadow-lg"
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -116,10 +116,10 @@ export default function AdminLogin() {
               />
             </div>
             <h1 className={`text-3xl md:text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-2`}>
-              Gospel Sounders
+              Old SDA Organization
             </h1>
             <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Publications & Missions
+              Restoring the Old Adventism
             </p>
           </div>
 
@@ -312,7 +312,7 @@ export default function AdminLogin() {
           {/* Footer Note */}
           <div className="mt-6 text-center">
             <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-              © {new Date().getFullYear()} Gospel Sounders Publications & Missions
+              © {new Date().getFullYear()} Old SDA Organization. All rights reserved.
               <br />
               All administrative activities are logged for security purposes
             </p>

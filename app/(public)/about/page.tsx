@@ -1,219 +1,316 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 export default function AboutPage() {
-  return (
-    <main className="min-h-screen bg-gradient-to-b from-[#020617] via-[#0b1220] to-[#020617] text-white px-6 py-16">
+  const [activeImage, setActiveImage] = useState<string | null>(null);
 
-      {/* HEADER */}
-      <div className="text-center max-w-4xl mx-auto mb-16">
-        <h1 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
-          Old SDA Organization
-        </h1>
-
-        <div className="h-1 w-24 mx-auto mt-4 bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500 rounded-full" />
-
-        <p className="text-blue-200 text-lg md:text-xl mt-6 max-w-2xl mx-auto">
-          <span className="text-cyan-300 font-semibold">Restoring Old Adventism</span> | Based on the 1872 & 1889 Fundamental Principles
-        </p>
+  const Section = ({
+    title,
+    text,
+    image,
+    reverse = false,
+    dark = false,
+  }: {
+    title: string;
+    text: string;
+    image: string;
+    reverse?: boolean;
+    dark?: boolean;
+  }) => (
+    <motion.section
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`grid md:grid-cols-2 gap-8 items-center rounded-2xl overflow-hidden shadow-xl`}
+    >
+      {/* IMAGE */}
+      <div
+        className={`relative h-80 md:h-96 w-full cursor-pointer ${
+          reverse ? "md:order-2" : ""
+        }`}
+        onClick={() => setActiveImage(image)}
+      >
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover hover:scale-105 transition duration-700"
+        />
       </div>
 
-      {/* CONTENT - FULL UNMODIFIED TEXT WITH ONLY SPELLING/PUNCTUATION CORRECTIONS */}
-      <div className="max-w-4xl mx-auto space-y-12">
+      {/* TEXT CARD - ENHANCED FONT SIZES FOR READABILITY */}
+      <div
+        className={`p-7 md:p-10 ${
+          dark
+            ? "bg-slate-950 text-white border border-slate-800"
+            : "bg-white text-slate-900 border border-slate-200"
+        } ${reverse ? "md:order-1" : ""}`}
+      >
+        <h2
+          className={`text-3xl md:text-4xl font-extrabold mb-5 ${
+            dark ? "text-cyan-300" : "text-slate-900"
+          }`}
+        >
+          {title}
+        </h2>
 
-        {/* SECTION: Foundation */}
-        <section className="bg-white/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-md">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">Our Foundation: A Quest for Truth</h2>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            The Old SDA Organization traces its roots to <span className="text-cyan-300 font-semibold">Amazing Facts Europe Kenya Campus</span> and a deep, prayerful quest for truth. In 2018, after a powerful convention at <span className="text-cyan-300 font-semibold">Ranen Lwala SDA Church, Ranen Conference</span>, the doctrine of the <span className="text-cyan-300 font-semibold">One True God</span> as taught by the early SDA pioneers was openly presented. This biblical teaching led to the censure of <span className="text-cyan-300 font-semibold">Young Evangelist Ministry</span> by Ranen Conference, marking the beginning of our journey to "contend for the faith which was once delivered unto the saints." <span className="italic text-cyan-200">Jude 1:3</span>
-          </p>
-        </section>
+        <div
+          className={`text-xl md:text-xl leading-relaxed whitespace-pre-line space-y-4 ${
+            dark ? "text-slate-200" : "text-slate-700"
+          }`}
+        >
+          {text.split('\n\n').map((paragraph, idx) => (
+            <p key={idx}>{paragraph}</p>
+          ))}
+        </div>
+      </div>
+    </motion.section>
+  );
 
-        {/* SECTION: 2019 */}
-        <section className="bg-white/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-md">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">2019 – Public Witness & First Trials</h2>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            In 2019 we began preaching openly and holding public missions. The <span className="text-cyan-300 font-semibold">Kanyadoto Mission 2019</span> resulted in the opening of <span className="text-cyan-300 font-semibold">Amazing Grace SDA Church</span>. We are sorry to say the General Conference, which holds to the Trinity, later took the church from us.
-          </p>
-          <p className="text-blue-100 leading-relaxed">
-            It was during the <span className="text-cyan-300 font-semibold">Embu Campmeeting 2019</span> that Bro. Alvin Ogaga and Bro. Erick Leo were baptized into the One True God by Pastor Daniel Mesa of USA.
-          </p>
-        </section>
+  return (
+    <main
+      className="min-h-screen text-white bg-cover bg-center bg-fixed relative pt-28 pb-16 px-4"
+      style={{
+        backgroundImage: "url('/images/nature1.jpg')",
+      }}
+    >
+      {/* GLOBAL OVERLAY */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
 
-        {/* SECTION: 2020 */}
-        <section className="bg-white/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-md">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">2020 – Separation, Home Churches & First Baptisms</h2>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">January 2020:</span> The first believers to separate and worship in their homes were <span className="text-cyan-300 font-semibold">Bro. Erick Leo of Ranen, Bro. Jefferson Oluoch, and Bro. Bernard Odhiambo</span>.
-          </p>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">February 2020:</span> COVID-19 entered Kenya. With all General Conference churches closed, this became a milestone for full separation. We promoted worship in homes, forests, and by rivers, teaching the <span className="text-cyan-300 font-semibold">Three Angels' Messages</span> and standing firmly on the <span className="text-cyan-300 font-semibold">1872 and 1889 Fundamental Principles</span> of the old SDA Church.
-          </p>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">Baptisms Began:</span> We invited ordained ministers from sister ministry <span className="text-cyan-300 font-semibold">Gospel Sounders</span>. <span className="text-cyan-300 font-semibold">Ev. Zaddock Ponde</span> baptized converts in 2020, including the late young man <span className="text-cyan-300 font-semibold">Geoffrey</span> and <span className="text-cyan-300 font-semibold">Sister Lydia Miginjo</span> in River Kuja — "baptized in One True God through Christ Jesus."
-          </p>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">The Lord's Table</span> began in our houses, especially in Ranen.
-          </p>
-          <p className="text-blue-100 leading-relaxed">
-            <span className="font-semibold text-cyan-200">December 2020:</span> <span className="text-cyan-300 font-semibold">Ramoya Mission</span> was held. We are sorry to say the GC took over and rebaptized over 32 of our people into the Trinity.
-          </p>
-        </section>
+      <div className="relative z-10 max-w-6xl mx-auto space-y-12">
 
-        {/* SECTION: 2021 */}
-        <section className="bg-white/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-md">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">2021 – No Collaboration: Campmeetings & Church Organization</h2>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            In 2021 we made a solemn decision: no collaboration with any Trinitarian church. We would hold our own campmeetings, missions, and trainings as <span className="text-cyan-300 font-semibold">One True God believers</span>.
-          </p>
-          <div className="bg-blue-950/30 border-l-4 border-cyan-400 p-4 my-6 rounded-r-xl">
-            <p className="font-semibold text-cyan-200 mb-2">July 2021 – Rongo Campmeeting at Sawayume Grounds</p>
-            <p className="text-blue-100"><span className="font-semibold">Theme:</span> <span className="italic">I Want My Church Back</span></p>
-            <p className="text-blue-100"><span className="font-semibold">Key Text:</span> 1 Timothy 3:14-15 | <span className="font-semibold">Song:</span> SDA Hymnal 212</p>
-            <p className="text-blue-100 mt-2"><span className="font-semibold">Speakers:</span></p>
-            <ul className="list-disc list-inside text-blue-100 ml-4 space-y-1 mt-1">
-              <li><span className="font-semibold">Sermon:</span> Bro. Fred Agoro</li>
-              <li><span className="font-semibold">Bible Study:</span> Fred Ndege</li>
-              <li><span className="font-semibold">Prophecy:</span> Alvin Ogaga</li>
-              <li><span className="font-semibold">Gospel Order:</span> Erick Leo</li>
-              <li><span className="font-semibold">Youths:</span> Ken Tolo</li>
-              <li><span className="font-semibold">Reformation & True Education:</span> Maxwell Okoth</li>
-              <li><span className="font-semibold">Publishing:</span> Benazigwe Nzowe</li>
-              <li><span className="font-semibold">Righteousness by Faith:</span> Ev. Kosgey Stephen</li>
-            </ul>
-            <p className="text-blue-100 mt-3"><span className="font-semibold">Baptism:</span> 17 souls baptized into the One True God by Bro. Erick Leo.</p>
-          </div>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            After prayer and study of <span className="text-cyan-300">1SM 204.1-2, 2SM 384, Jeremiah 6:16, Revelation 14:6-12</span>, we concluded the current SDA organization is not the original. We realized the <span className="text-cyan-300 font-semibold">Jesuits have infiltrated everything</span>: Fundamental Principles were changed to Fundamental Beliefs, God was changed to the Trinity which we believe are false gods, and the logo was changed from the Three Angels' Messages to flames which we understand to be of Jesuit origin. Therefore, we <span className="text-cyan-300 font-semibold">fully separated and organized into the Old SDA Church</span>.
-          </p>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">July 2021:</span> <span className="text-cyan-300 font-semibold">Rongo Church</span> was the first local church organized.
-          </p>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">November 2021:</span> Old SDA Rongo and Young Evangelist Ministry entered <span className="text-cyan-300 font-semibold">Nandi Region</span>, opening <span className="text-cyan-300 font-semibold">Mosombor Old SDA Church, Kapsimatwo, and Mogoiwet</span>. Bro. Emmanuel Juma and Zaddock Omollo remained as missionaries. The first missionary to Nandi in August 2021 was <span className="text-cyan-300 font-semibold">Ev. Maxwell Okoth</span>.
-          </p>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">December 2021:</span> <span className="text-cyan-300 font-semibold">1st Nandi Campmeeting at Kaiboi</span>. Many baptized by Bro. Erick Leo. Through Rongo Church support, missions reached <span className="text-cyan-300">Kadel, Seka, Adek Kabuoch, Kisii, Kuria, Chamgiwadu, Kobodo, Sori Karungu</span>, and more.
-          </p>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="text-cyan-300 font-semibold">Kadel Church</span> was organized to serve the Karachuonyo region.
-          </p>
-          <p className="text-blue-100 leading-relaxed">
-            <span className="font-semibold">Key Pioneers:</span> Ev. Maxwell Okoth, Erick Leo, Alvin Ogaga, and Emmanuel Juma led these missions. The first missionary to Karachuonyo was Maxwell Okoth.
-          </p>
-        </section>
+        {/* HEADER - ENHANCED FONT SIZES */}
+        <div className="text-center pt-6 md:pt-10">
+          <h1 className="text-4xl md:text-6xl font-black">
+            OLD SDA <span className="text-cyan-300">ORGANIZATION</span>
+          </h1>
 
-        {/* SECTION: 2022 */}
-        <section className="bg-white/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-md">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">2022 – Persecution, Ordination & Conference Organization</h2>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            <span className="font-semibold text-cyan-200">February 2022:</span> First <span className="text-cyan-300 font-semibold">Old SDA Revival Week of Prayer</span> held between Rongo and Nandi larger churches. Speakers exchanged: Maxwell Okoth went to Nandi, Emmanuel Juma to Rongo.
+          <p className="text-cyan-100 mt-4 text-lg md:text-2xl font-medium">
+            Restoring Old Adventism | Based on the 1872 & 1889 Fundamental Principles
           </p>
-          <div className="bg-red-950/20 border-l-4 border-red-500 p-4 my-6 rounded-r-xl">
-            <p className="font-semibold text-cyan-200 mb-2">Persecution for Faith:</p>
-            <p className="text-blue-100">Brethren were arrested in Nandi and Rongo for separation from the apostate SDA church and for accepting true education. Those arrested and charged include:<br />
-            Ev. Maxwell Okoth – arrested twice, escaped twice; Usher Jeffrey – whereabouts unknown; Charles Ogolla – no longer Old SDA; Ruth Omingo; Veldah Verah; Elias Ondoro; the late John Rugut; Zaddock Omollo; Ruth Chelagat. All were sponsored by enemies of truth.</p>
-          </div>
-          <div className="bg-blue-950/30 border-l-4 border-cyan-400 p-4 my-6 rounded-r-xl">
-            <p className="font-semibold text-cyan-200 mb-2">July 2022 – Rongo Kasere Center Campmeeting</p>
-            <p className="text-blue-100"><span className="font-semibold">Theme:</span> <span className="italic">No New Organization</span></p>
-            <p className="text-blue-100"><span className="font-semibold">Key Text:</span> Isaiah 28:16 | <span className="font-semibold">Song:</span> SDA Hymnal 504</p>
-            <p className="text-blue-100 mt-2"><span className="font-semibold">Speakers:</span> Ev. Maxwell Okoth – Sermon & Youth; Ev. Titus Kulu – Prophecy & True Education; Bro. Alvin Ogaga – Stewardship; Bro. Brian Weave – Stewardship; Bro. Allan Ongolla – Health; Bro. Kosgey Stephen – Righteousness by Faith & Country Living.</p>
-            <p className="text-blue-100 mt-2">Nandi Campmeeting was also held, attended by Allan Ongolla and Brighton Ouru.</p>
-          </div>
-          <div className="bg-indigo-950/30 border-l-4 border-indigo-400 p-4 my-6 rounded-r-xl">
-            <p className="font-semibold text-cyan-200 mb-2">First Ordination of Ministers:</p>
-            <p className="text-blue-100">After the campmeeting, the church authorized the first ordination:</p>
-            <ol className="list-decimal list-inside text-blue-100 ml-4 mt-2 space-y-1">
-              <li><span className="font-semibold">Ev. Maxwell Okoth</span></li>
-              <li><span className="font-semibold">Ev. Emmanuel Juma</span></li>
-              <li><span className="font-semibold">Ev. Charles Ogolla</span></li>
-            </ol>
-            <p className="text-blue-100 mt-2">Led by Elder Ken Tolo and Erick Leo. They were recommended by the brethren and authorized to preach, baptize, and organize churches according to Gospel Order.</p>
-          </div>
-          <div className="bg-blue-950/30 border-l-4 border-cyan-400 p-4 my-6 rounded-r-xl">
-            <p className="font-semibold text-cyan-200 mb-2">October 2022 – Nyanza Nandi Region Conference Organized</p>
-            <p className="text-blue-100">All local churches gathered and formed the <span className="text-cyan-300 font-semibold">Old SDA Nyanza Nandi Conference</span>.</p>
-            <p className="text-blue-100 mt-2"><span className="font-semibold">Elections:</span></p>
-            <ol className="list-decimal list-inside text-blue-100 ml-4 mt-1 space-y-1">
-              <li><span className="font-semibold">Maxwell Okoth</span> – Coordinating Chair</li>
-              <li><span className="font-semibold">Charles Ogolla</span> – Secretary</li>
-              <li><span className="font-semibold">Jefferson Oluoch</span> – Treasurer</li>
-              <li><span className="font-semibold">Zaddock Omollo</span> – Nandi Representative</li>
-            </ol>
-            <p className="text-blue-100 mt-2">Plus departmental heads.</p>
-            <p className="text-blue-100 mt-2"><span className="font-semibold">Finance:</span> Agreed to send 50% of tithes and 30% of offerings to support ministers and organizational activities. Church envelopes were made.</p>
-            <p className="text-blue-100 mt-2"><span className="font-semibold">Focus Areas Agreed:</span> More missions, medical missionary work, true education schools, train workers, train youth in handwork in collaboration with Gachie Church, Kiambu.</p>
-          </div>
-        </section>
 
-        {/* SECTION: 2022 to Present */}
-        <section className="bg-white/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-md">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">2022 to Present – Growth & Mission</h2>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            From 2022 until now, organization has helped us:
+          <p className="text-slate-200 mt-6 text-lg md:text-xl max-w-3xl mx-auto italic">
+            “Thus saith the Lord, Stand ye in the ways, and see, and ask for the old paths, where is the good way, and walk therein, and ye shall find rest for your souls.” — Jeremiah 6:16
           </p>
-          <ol className="list-decimal list-inside text-blue-100 space-y-3 ml-4 mb-4">
-            <li><span className="font-semibold">Maintain church property</span> and open new churches in and beyond our borders: <span className="text-cyan-300">Nairobi City, Weitethie Thika, Lusigeti Kikuyu, Thogoto Kikuyu, Soy Kakamega, Bungoma, Eldoret, Malindi, Uganda, Tanzania, South Sudan</span>, among many others.</li>
-            <li><span className="font-semibold">Baptisms:</span> Over <span className="text-cyan-300 font-bold">800 souls</span> baptized into the One True God. More than <span className="text-cyan-300 font-bold">900</span> are currently under instruction for baptism.</li>
-            <li><span className="font-semibold">Leadership:</span> More elders and ministers ordained.</li>
-            <li><span className="font-semibold">True Education:</span> Established centers to help our young people. We run a simple publishing house producing our own pioneer lessons.</li>
-            <li><span className="font-semibold">Bible Workers:</span> Trained and sent many young people as missionaries across the country, supported by the church.</li>
-          </ol>
-          <p className="text-blue-100 italic text-center text-cyan-200 text-lg">“Even though we are poor we are rich in Christ.”</p>
-          <p className="text-blue-100 leading-relaxed mt-4">
-            <span className="font-semibold text-cyan-200">January 2023:</span> United with other like-minded regions in Kenya and formed the <span className="text-cyan-300 font-semibold">Larger Old SDA Organization in Kenya</span>.
+        </div>
+
+        {/* ================= COMPLETE TEXT WITH ALL DETAILS ================= */}
+
+        <Section
+          dark={true}
+          title="Our Foundation: A Quest for Truth"
+          image="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop"
+          text={`The Old SDA Organization traces its roots to Amazing Facts Europe Kenya Campus and a deep, prayerful quest for truth.
+
+In 2018, after a powerful convention at Ranen Lwala SDA Church, Ranen Conference, the doctrine of the One True God as taught by the early SDA pioneers was openly presented. This biblical teaching led to the censure of Young Evangelist Ministry by Ranen Conference, marking the beginning of our journey to “contend for the faith which was once delivered unto the saints.” Jude 1:3`}
+        />
+
+        <Section
+          dark={false}
+          reverse
+          title="2019 – Public Witness & First Trials"
+          image="https://images.unsplash.com/photo-1464983953574-0892a716854b?w=800&h=600&fit=crop"
+          text={`In 2019 we began preaching openly and holding public missions. The Kanyadoto Mission 2019 resulted in the opening of Amazing Grace SDA Church. We are sorry to say the General Conference, which holds to the Trinity, later took the church from us.
+
+It was during the Embu Campmeeting 2019 that Bro. Alvin Ogaga and Bro. Erick Leo were baptized into the One True God by Pastor Daniel Mesa of USA.`}
+        />
+
+        <Section
+          dark={true}
+          title="2020 – Separation, Home Churches & First Baptisms"
+          image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&h=600&fit=crop"
+          text={`January 2020: The first believers to separate and worship in their homes were Bro. Erick Leo of Ranen, Bro. Jefferson Oluoch, and Bro. Bernard Odhiambo.
+
+February 2020: COVID-19 entered Kenya. With all General Conference churches closed, this became a milestone for full separation. We promoted worship in homes, forests, and by rivers, teaching the Three Angels' Messages and standing firmly on the 1872 and 1889 Fundamental Principles of the old SDA Church.
+
+Baptisms Began: We invited ordained ministers from sister ministry Gospel Sounders. Ev. Zaddock Ponde baptized converts in 2020, including the late young man Geoffrey and Sister Lydia Miginjo in River Kuja — “baptized in One True God through Christ Jesus.”
+
+The Lord's Table began in our houses, especially in Ranen.
+
+December 2020: Ramoya Mission was held. We are sorry to say the GC took over and rebaptized over 32 of our people into the Trinity.`}
+        />
+
+        <Section
+          dark={false}
+          reverse
+          title="2021 – No Collaboration: Campmeetings & Church Organization"
+          image="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop"
+          text={`In 2021 we made a solemn decision: no collaboration with any Trinitarian church. We would hold our own campmeetings, missions, and trainings as One True God believers.
+
+July 2021 – Rongo Campmeeting at Sawayume Grounds
+Theme: I Want My Church Back
+Key Text: 1 Timothy 3:14-15 | Song: SDA Hymnal 212
+
+Speakers:
+- Sermon: Bro. Fred Agoro
+- Bible Study: Fred Ndege
+- Prophecy: Alvin Ogaga
+- Gospel Order: Erick Leo
+- Youths: Ken Tolo
+- Reformation & True Education: Maxwell Okoth
+- Publishing: Benazigwe Nzowe
+- Righteousness by Faith: Ev. Kosgey Stephen
+
+Baptism: 17 souls baptized into the One True God by Bro. Erick Leo.
+
+After prayer and study of 1SM 204.1-2, 2SM 384, Jeremiah 6:16, Revelation 14:6-12, we concluded the current SDA organization is not the original. We realized the Jesuits have infiltrated everything: Fundamental Principles were changed to Fundamental Beliefs, God was changed to the Trinity which we believe are false gods, and the logo was changed from the Three Angels' Messages to flames which we understand to be of Jesuit origin. Therefore, we fully separated and organized into the Old SDA Church.
+
+July 2021: Rongo Church was the first local church organized.
+
+November 2021: Old SDA Rongo and Young Evangelist Ministry entered Nandi Region, opening Mosombor Old SDA Church, Kapsimatwo, and Mogoiwet. Bro. Emmanuel Juma and Zaddock Omollo remained as missionaries. The first missionary to Nandi in August 2021 was Ev. Maxwell Okoth.
+
+December 2021: 1st Nandi Campmeeting at Kaiboi. Many baptized by Bro. Erick Leo. Through Rongo Church support, missions reached Kadel, Seka, Adek Kabuoch, Kisii, Kuria, Chamgiwadu, Kobodo, Sori Karungu, and more.
+
+Kadel Church was organized to serve the Karachuonyo region.
+
+Key Pioneers: Ev. Maxwell Okoth, Erick Leo, Alvin Ogaga, and Emmanuel Juma led these missions. The first missionary to Karachuonyo was Maxwell Okoth.`}
+        />
+
+        <Section
+          dark={true}
+          title="2022 – Persecution, Ordination & Conference Organization"
+          image="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&h=600&fit=crop"
+          text={`February 2022: First Old SDA Revival Week of Prayer held between Rongo and Nandi larger churches. Speakers exchanged: Maxwell Okoth went to Nandi, Emmanuel Juma to Rongo.
+
+Persecution for Faith: Brethren were arrested in Nandi and Rongo for separation from the apostate SDA church and for accepting true education. Those arrested and charged include: Ev. Maxwell Okoth – arrested twice, escaped twice; Usher Jeffrey – whereabouts unknown; Charles Ogolla – no longer Old SDA; Ruth Omingo; Veldah Verah; Elias Ondoro; the late John Rugut; Zaddock Omollo; Ruth Chelagat. All were sponsored by enemies of truth.
+
+July 2022 – Rongo Kasere Center Campmeeting
+Theme: No New Organization
+Key Text: Isaiah 28:16 | Song: SDA Hymnal 504
+
+Speakers: Ev. Maxwell Okoth – Sermon & Youth; Ev. Titus Kulu – Prophecy & True Education; Bro. Alvin Ogaga – Stewardship; Bro. Brian Weave – Stewardship; Bro. Allan Ongolla – Health; Bro. Kosgey Stephen – Righteousness by Faith & Country Living.
+
+Nandi Campmeeting was also held, attended by Allan Ongolla and Brighton Ouru.
+
+First Ordination of Ministers: After the campmeeting, the church authorized the first ordination:
+1. Ev. Maxwell Okoth
+2. Ev. Emmanuel Juma
+3. Ev. Charles Ogolla
+Led by Elder Ken Tolo and Erick Leo. They were recommended by the brethren and authorized to preach, baptize, and organize churches according to Gospel Order.
+
+October 2022 – Nyanza Nandi Region Conference Organized
+All local churches gathered and formed the Old SDA Nyanza Nandi Conference.
+
+Elections:
+1. Maxwell Okoth – Coordinating Chair
+2. Charles Ogolla – Secretary
+3. Jefferson Oluoch – Treasurer
+4. Zaddock Omollo – Nandi Representative
+Plus departmental heads.
+
+Finance: Agreed to send 50% of tithes and 30% of offerings to support ministers and organizational activities. Church envelopes were made.
+
+Focus Areas Agreed: More missions, medical missionary work, true education schools, train workers, train youth in handwork in collaboration with Gachie Church, Kiambu.`}
+        />
+
+        <Section
+          dark={false}
+          reverse
+          title="2022 to Present – Growth & Mission"
+          image="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800&h=600&fit=crop"
+          text={`From 2022 until now, organization has helped us:
+1. Maintain church property and open new churches in and beyond our borders: Nairobi City, Weitethie Thika, Lusigeti Kikuyu, Thogoto Kikuyu, Soy Kakamega, Bungoma, Eldoret, Malindi, Uganda, Tanzania, South Sudan, among many others.
+2. Baptisms: Over 800 souls baptized into the One True God. More than 900 are currently under instruction for baptism.
+3. Leadership: More elders and ministers ordained.
+4. True Education: Established centers to help our young people. We run a simple publishing house producing our own pioneer lessons.
+5. Bible Workers: Trained and sent many young people as missionaries across the country, supported by the church.
+
+“Even though we are poor we are rich in Christ.”
+
+January 2023: United with other like-minded regions in Kenya and formed the Larger Old SDA Organization in Kenya.`}
+        />
+
+        <Section
+          dark={true}
+          title="What We Believe"
+          image="https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=800&h=600&fit=crop"
+          text={`We remain steadfast in the Bible and the Spirit of Prophecy as manifested in the writings of Ellen G. White.
+
+1. Scripture: We accept the whole Bible as inspired. We do not reject portions of Scripture.
+2. Spirit of Prophecy: We accept all SOP books unless light is given from the Word otherwise.
+3. Godhead: We do not believe in the Trinity. “There is one God, the Father... and one Lord Jesus Christ” 1 Corinthians 8:6; John 17:3.
+4. Jesus Christ: We believe He is the literal Son of God. John 3:16
+5. Holy Spirit: We believe the Holy Spirit is the power, influence, and character that proceeds from the Father through His Son.
+6. Separation: We reject the Trinity in all its forms – Catholic or SDA. This principle caused our separation. We reject any ecumenical movement as papal and satanic. We subscribe to no umbrella body of religion.
+7. Church & State: We believe in separation of church and state. Our organization has nothing to do with politics or elections. Members are free to choose whether to vote after being taught the position of Bible and SOP.
+8. True Education: A must. “We believe without education no redemption.” Members are free to choose after being taught – no coercion. True education is the only hope for a permanent reformatory movement.`}
+        />
+
+        <Section
+          dark={false}
+          reverse
+          title="Our Mission Today"
+          image="https://images.unsplash.com/photo-1446057032654-9d8885db76c6?w=800&h=600&fit=crop"
+          text={`1. Preach the Three Angels' Messages of Revelation 14:6-12 in their pioneer purity.
+2. Call God's people out of Babylon and back to the "old paths." Jeremiah 6:16
+3. Expose Jesuit infiltration that has changed Fundamental Principles to Fundamental Beliefs, introduced the Trinity, and altered the symbols of Adventism.
+4. Establish true education, health reform, and country living as given to the pioneers.
+5. Organize churches on Gospel Order as found in 1 Corinthians 12 & 13.
+6. Prepare a people for the Latter Rain and the coming of Jesus.`}
+        />
+
+        {/* Footer / Welcome Section with Contact */}
+        <div className="bg-slate-950/90 backdrop-blur-sm border border-cyan-800 rounded-2xl p-8 md:p-12 text-center mt-8">
+          <h2 className="text-3xl md:text-5xl font-bold text-cyan-300 mb-4">
+            Welcome to Old SDA Organization
+          </h2>
+          <p className="text-xl md:text-2xl text-white mb-3">
+            Restoring Old Adventism
           </p>
-        </section>
-
-        {/* SECTION: What We Believe */}
-        <section className="bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-blue-950/40 border border-cyan-500/30 rounded-2xl p-6 md:p-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">What We Believe</h2>
-          <p className="text-blue-100 leading-relaxed mb-4">
-            We remain steadfast in the <span className="text-cyan-300 font-semibold">Bible and the Spirit of Prophecy</span> as manifested in the writings of Ellen G. White.
+          <div className="h-px bg-cyan-800 max-w-md mx-auto my-6"></div>
+          <p className="text-slate-300 text-base md:text-lg mb-2">
+            Headquarters: Rongo, Migori County, Kenya
           </p>
-          <div className="space-y-3 text-blue-100">
-            <p><span className="font-semibold text-cyan-200">1. Scripture:</span> We accept the whole Bible as inspired. We do not reject portions of Scripture.</p>
-            <p><span className="font-semibold text-cyan-200">2. Spirit of Prophecy:</span> We accept all SOP books unless light is given from the Word otherwise.</p>
-            <p><span className="font-semibold text-cyan-200">3. Godhead:</span> We do <span className="italic text-cyan-300">not</span> believe in the Trinity. <span className="italic">“There is one God, the Father... and one Lord Jesus Christ”</span> <span className="text-cyan-200">1 Corinthians 8:6; John 17:3</span>.</p>
-            <p><span className="font-semibold text-cyan-200">4. Jesus Christ:</span> We believe He is the literal Son of God. <span className="text-cyan-200">John 3:16</span></p>
-            <p><span className="font-semibold text-cyan-200">5. Holy Spirit:</span> We believe the Holy Spirit is the power, influence, and character that proceeds from the Father through His Son.</p>
-            <p><span className="font-semibold text-cyan-200">6. Separation:</span> We reject the Trinity in all its forms – Catholic or SDA. This principle caused our separation. We reject any ecumenical movement as papal and satanic. We subscribe to no umbrella body of religion.</p>
-            <p><span className="font-semibold text-cyan-200">7. Church & State:</span> We believe in separation of church and state. Our organization has nothing to do with politics or elections. Members are free to choose whether to vote after being taught the position of Bible and SOP.</p>
-            <p><span className="font-semibold text-cyan-200">8. True Education:</span> A must. <span className="italic">“We believe without education no redemption.”</span> Members are free to choose after being taught – no coercion. True education is the only hope for a permanent reformatory movement.</p>
-          </div>
-        </section>
-
-        {/* SECTION: Our Mission Today */}
-        <section className="bg-white/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-md">
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-300 border-l-4 border-cyan-400 pl-4 mb-6">Our Mission Today</h2>
-          <ol className="list-decimal list-inside text-blue-100 space-y-3 ml-4">
-            <li>Preach the <span className="text-cyan-300 font-semibold">Three Angels' Messages</span> of Revelation 14:6-12 in their pioneer purity.</li>
-            <li>Call God's people out of Babylon and back to the <span className="italic text-cyan-300">“old paths.”</span> <span className="text-cyan-200">Jeremiah 6:16</span></li>
-            <li>Expose Jesuit infiltration that has changed Fundamental Principles to Fundamental Beliefs, introduced the Trinity, and altered the symbols of Adventism.</li>
-            <li>Establish true education, health reform, and country living as given to the pioneers.</li>
-            <li>Organize churches on Gospel Order as found in 1 Corinthians 12 & 13.</li>
-            <li>Prepare a people for the Latter Rain and the coming of Jesus.</li>
-          </ol>
-        </section>
-
-        {/* FOOTER / CONTACT */}
-        <div className="text-center pt-8 border-t border-blue-500/20">
-          <h2 className="text-2xl font-bold text-cyan-300 mb-4">Welcome to Old SDA Organization</h2>
-          <p className="text-blue-200 text-lg mb-2">Restoring Old Adventism</p>
-          <div className="h-0.5 w-16 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto my-4"></div>
-          <p className="text-blue-300 mb-1">📍 Headquarters: Rongo, Migori County, Kenya</p>
-          <p className="text-blue-300 mb-6">📧 Contact: oldsdaorganization@gmail.com</p>
-          <div className="bg-blue-950/30 border-l-4 border-cyan-400 p-5 max-w-2xl mx-auto rounded-r-xl">
-            <p className="text-cyan-200 italic text-lg">
+          <p className="text-slate-300 text-base md:text-lg">
+            Contact: oldsdaorganization@gmail.com
+          </p>
+          <div className="mt-8 pt-4 border-t border-slate-800">
+            <p className="text-cyan-100 text-xl md:text-xl italic">
               “Thus saith the Lord, Stand ye in the ways, and see, and ask for the old paths, where is the good way, and walk therein, and ye shall find rest for your souls.”
             </p>
-            <p className="text-blue-200 font-semibold mt-2">Jeremiah 6:16</p>
+            <p className="text-slate-400 mt-2">Jeremiah 6:16</p>
           </div>
         </div>
 
       </div>
+
+      {/* ================= IMAGE LIGHTBOX ================= */}
+      <AnimatePresence>
+        {activeImage && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveImage(null)}
+          >
+            <motion.div
+              className="relative w-full max-w-6xl h-[85vh]"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={activeImage}
+                alt="preview"
+                fill
+                className="object-contain rounded-xl"
+              />
+
+              <button
+                onClick={() => setActiveImage(null)}
+                className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white px-5 py-2 rounded-full text-lg font-medium transition"
+              >
+                Close ✕
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

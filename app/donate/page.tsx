@@ -3,7 +3,7 @@ export default function DonatePage() {
     <main className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-xl bg-white p-8 rounded-xl shadow-lg text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Support Gospel Sounders Ministry
+          Support Old SDA Organization
         </h1>
 
         <p className="text-gray-600 leading-relaxed mb-6">

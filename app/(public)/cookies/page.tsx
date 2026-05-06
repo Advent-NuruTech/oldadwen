@@ -11,7 +11,7 @@ export default function CookiesPolicyPage() {
             Cookies Policy
           </h1>
           <p className="text-lg text-gray-700 dark:text-[#D8C9B4] max-w-3xl mx-auto md:mx-0">
-            This Cookies Policy explains how Gospel Sounders Publications and Missions uses cookies to enhance your experience.
+            This Cookies Policy explains how Old SDA Organization uses cookies to enhance your experience.
           </p>
         </header>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import EditProfile from "@/components/admin/EditProfile";
 import AddAdmin from "@/components/admin/AddAdmin";
+import TrueEducationMessage from "@/components/public/TrueEducationMessage";
 import { signOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";

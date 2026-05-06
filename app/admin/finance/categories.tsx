@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useState } from "react";
@@ -10,7 +10,7 @@ import { FinanceType } from "@/lib/financeTypes";
 const TYPES: FinanceType[] = ["tithe1", "tithe2", "offering", "donation", "campaign"];
 
 export default function FinanceCategoriesView() {
-  const { categories } = useFinanceRealtimeData();
+  const { categories } = useFinanceRealtimeData({ includeTransactions: false, includeReceipts: false });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -123,3 +123,4 @@ export default function FinanceCategoriesView() {
     </div>
   );
 }
+

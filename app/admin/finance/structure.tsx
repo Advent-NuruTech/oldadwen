@@ -1,13 +1,13 @@
-﻿"use client";
+"use client";
 
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 
 import { useFinanceRealtimeData } from "@/hooks/useFinanceRealtimeData";
 import { db } from "@/lib/firebase";
 
 export default function FinanceStructureView() {
-  const { conferences, regions, churches, loading, error } = useFinanceRealtimeData();
+  const { conferences, regions, churches, loading, error } = useFinanceRealtimeData({ includeTransactions: false, includeReceipts: false });
 
   const [conferenceName, setConferenceName] = useState("");
   const [conferenceCode, setConferenceCode] = useState("");
@@ -142,7 +142,7 @@ export default function FinanceStructureView() {
   );
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
       <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
@@ -189,3 +189,4 @@ function Select({
     </label>
   );
 }
+
