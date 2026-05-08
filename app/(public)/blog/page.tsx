@@ -104,22 +104,29 @@ export default function BlogPage() {
   }, [filters, blogs]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0A0E27] via-[#0F172A] to-[#1E1B4B]">
+    <main
+      className="min-h-screen text-white bg-cover bg-center bg-fixed relative pt-28 pb-16 px-4"
+      style={{
+        backgroundImage: "url('https://res.cloudinary.com/dg7jxs7st/image/upload/v1778153542/download_1_y3x4sq.jpg')",
+      }}
+    >
+      {/* GLOBAL OVERLAY */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-[3px]" />
 
-      {/* HEADER */}
-      <div className="max-w-7xl mx-auto px-4 md:px-12 pt-10">
-        <div className="text-center mb-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-12">
+        {/* HEADER */}
+        <div className="text-center mb-10 pt-6 md:pt-10">
           <div className="inline-block mb-3 px-3 py-1 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/30">
-            <span className="text-xs text-[#60A5FA] font-medium">
-              Insights & Articles
+            <span className="text-lg text-[#60A5FA] font-medium">
+              restoring old adventism
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white">
-            Blog & Teachings
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white">
+            Articles & Teachings
           </h1>
 
-          <p className="text-gray-400 mt-2">
+          <p className="text-gray-300 mt-4 text-lg md:text-xl">
             Explore spiritual insights and teachings
           </p>
         </div>
@@ -132,11 +139,8 @@ export default function BlogPage() {
           resultCount={filteredBlogs.length}
           totalCount={blogs.length}
         />
-      </div>
 
-      {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-4 md:px-12 pb-12">
-
+        {/* CONTENT */}
         {isSearching && (
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-white">
@@ -176,7 +180,7 @@ export default function BlogPage() {
                     dateFilter: "",
                   })
                 }
-                className="px-6 py-3 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white rounded-lg font-semibold"
+                className="px-6 py-3 bg-gradient-to-r from-[#2563EB]/80 to-[#1D4ED8]/80 text-white rounded-lg font-semibold hover:from-[#2563EB] hover:to-[#1D4ED8] transition"
               >
                 Clear Search
               </button>
@@ -198,7 +202,6 @@ function BlogCard({
 }) {
   return (
     <div className="flex flex-col rounded-2xl overflow-hidden bg-[#1E293B]/40 backdrop-blur border border-[#334155] shadow-xl hover:shadow-2xl transition">
-
       {blog.imageURL && (
         <img
           src={blog.imageURL}
@@ -208,7 +211,6 @@ function BlogCard({
       )}
 
       <div className="p-5 flex flex-col h-full">
-
         <h2
           className="text-lg font-bold text-white mb-2"
           dangerouslySetInnerHTML={{
@@ -224,13 +226,13 @@ function BlogCard({
         />
 
         {blog.createdAt && (
-          <p className="text-xs text-gray-400 mb-3">
+          <p className="text-xl text-gray-400 mb-3">
             {formatProfessionalDate(blog.createdAt)}
           </p>
         )}
 
         <p
-          className="text-gray-300 mb-4 line-clamp-4"
+          className="text-xl text-gray-300 mb-4 line-clamp-4"
           dangerouslySetInnerHTML={{
             __html: getPreviewWithHighlight(
               blog.content,
@@ -241,7 +243,7 @@ function BlogCard({
 
         <Link
           href={`/blog/${blog.id}`}
-          className="mt-auto text-center px-4 py-2 rounded-lg bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white font-semibold hover:scale-105 transition"
+          className="mt-auto text-center px-4 py-2 rounded-lg bg-gradient-to-r from-[#67e8f9]/80 to-[#1D4ED8]/80 text-white font-semibold hover:from-[#2563EB] hover:to-[#1D4ED8] hover:scale-105 transition"
         >
           Read More
         </Link>

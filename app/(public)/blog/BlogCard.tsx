@@ -54,7 +54,7 @@ export default function BlogCard({ blog, onReadMore }: BlogCardProps) {
 
   return (
     <article className="mb-10">
-      <div className="bg-white dark:bg-[#2A221C] border border-gray-200 dark:border-[#3A2F25] rounded-2xl shadow-md hover:shadow-xl transition p-5">
+      <div className="bg-black dark:bg-[#2A221C] border border-gray-200 dark:border-[#3A2F25] rounded-2xl shadow-md hover:shadow-xl transition p-5">
 
         {/* IMAGE */}
         {blog.imageURL && (
@@ -93,7 +93,7 @@ export default function BlogCard({ blog, onReadMore }: BlogCardProps) {
           <button
             onClick={() => onReadMore(blog.id)}
             className="mt-4 inline-block px-5 py-2 rounded-full font-semibold
-              bg-gradient-to-r from-[#6B4A2E] to-[#D9A441]
+              bg-gradient-to-r from-[#67e8f9] to-[#D9A441]
               text-white dark:text-black
               hover:opacity-90 transition"
           >
