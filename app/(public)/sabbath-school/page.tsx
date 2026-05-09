@@ -130,7 +130,7 @@ export default function SabbathSchoolPage() {
         className="min-h-screen text-white bg-cover bg-center bg-fixed relative pt-28 pb-16 px-4 overflow-x-hidden"
         style={{
           backgroundImage:
-            "url('https://res.cloudinary.com/dg7jxs7st/image/upload/v1778153542/download_1_y3x4sq.jpg')",
+            "url('https://res.cloudinary.com/dg7jxs7st/image/upload/v1778231376/nli-oct-screen-res-56_p1tvuj.jpg')",
         }}
       >
         <div className="absolute inset-0 bg-black/50 backdrop-blur-[3px]" />

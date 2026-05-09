@@ -165,7 +165,7 @@ export default function FinancePage() {
   return (
     <div
       className="min-h-screen text-white bg-cover bg-center bg-fixed relative pt-28 pb-16 px-4"
-      style={{ backgroundImage: "url('/images/nature1.jpg')" }}
+      style={{ backgroundImage: "url('https://res.cloudinary.com/dg7jxs7st/image/upload/v1778233238/download_3_kvoerc.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 

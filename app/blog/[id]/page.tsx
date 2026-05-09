@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import {
   doc,
@@ -13,6 +13,8 @@ import {
 } from "firebase/firestore";
 import { useParams, useRouter } from "next/navigation";
 import Head from "next/head";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Blog = {
   id: string;
@@ -62,15 +64,6 @@ function getExcerpt(text: string, words = 24) {
   return wordsArray.slice(0, words).join(" ") + "…";
 }
 
-function createShareText(title: string, description: string, maxWords = 60): string {
-  const titleWords = title.split(" ").length;
-  const availableWords = Math.max(10, maxWords - titleWords);
-  
-  const truncatedDesc = description.split(" ").slice(0, availableWords).join(" ");
-  const hasMore = description.split(" ").length > availableWords;
-  return `${title}. ${truncatedDesc}${hasMore ? '…' : ''}`;
-}
-
 function generateMetaDescription(blog: Blog): string {
   if (blog.description) {
     return blog.description.length > 160 
@@ -84,65 +77,17 @@ function generateMetaDescription(blog: Blog): string {
   return plainText.substring(0, 157) + "...";
 }
 
-// Image Modal Component
-function ImageModal({ imageUrl, alt, onClose }: { imageUrl: string; alt: string; onClose: () => void }) {
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEsc);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'auto';
-    };
-  }, [onClose]);
-
-  return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md transition-all duration-300"
-      onClick={onClose}
-    >
-      <div className="relative max-w-[90vw] max-h-[90vh]">
-        <button
-          onClick={onClose}
-          className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors text-3xl font-light"
-          aria-label="Close modal"
-        >
-          ✕
-        </button>
-        <img
-          src={imageUrl}
-          alt={alt}
-          className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-          onClick={(e) => e.stopPropagation()}
-        />
-      </div>
-    </div>
-  );
-}
-
-// Card component with consistent background
-function ConsistentCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`bg-[#111827]/90 backdrop-blur-sm border border-[#374151] rounded-2xl shadow-xl ${className}`}>
-      {children}
-    </div>
-  );
-}
-
 export default function BlogIdPage() {
   const params = useParams();
   const router = useRouter();
 
   const [blog, setBlog] = useState<Blog | null>(null);
   const [suggestedBlogs, setSuggestedBlogs] = useState<Blog[]>([]);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [metaDescription, setMetaDescription] = useState("");
   const [shareSupported, setShareSupported] = useState(false);
   const [contentParagraphs, setContentParagraphs] = useState<string[]>([]);
-  const [lastTwoParagraphs, setLastTwoParagraphs] = useState<string>("");
-  const [modalImage, setModalImage] = useState<string | null>(null);
 
   useEffect(() => {
     setShareSupported(!!navigator.share);
@@ -183,27 +128,7 @@ export default function BlogIdPage() {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = currentBlog.content;
       const paragraphs = Array.from(tempDiv.querySelectorAll('p')).map(p => p.innerHTML);
-      
-   const cleanedParagraphs = paragraphs.map((p) =>
-  p
-    // remove inline white backgrounds
-    .replace(/background-color\s*:\s*[^;"']+;?/gi, "")
-    .replace(/background\s*:\s*[^;"']+;?/gi, "")
-
-    // remove inline color styles causing visibility problems
-    .replace(/color\s*:\s*black;?/gi, "")
-    .replace(/color\s*:\s*#000;?/gi, "")
-
-    // remove empty style attrs
-    .replace(/style="\s*"/gi, "")
-);
-      setContentParagraphs(cleanedParagraphs);
-      
-      if (paragraphs.length >= 2) {
-        const lastTwo = paragraphs.slice(-2);
-        const lastTwoText = lastTwo.map(p => stripHtml(p)).join(' ');
-        setLastTwoParagraphs(lastTwoText);
-      }
+      setContentParagraphs(paragraphs);
 
       const blogsRef = collection(db, "blog");
       const q = query(blogsRef, where("__name__", "!=", id), limit(6));
@@ -245,7 +170,7 @@ export default function BlogIdPage() {
     
     try {
       const plainText = stripHtml(blog.content);
-      const shareText = createShareText(blog.title, plainText, 60);
+      const shareText = plainText.split(" ").slice(0, 60).join(" ") + (plainText.split(" ").length > 60 ? "…" : "");
       
       let shareData: ShareData = {
         title: blog.title,
@@ -306,7 +231,7 @@ export default function BlogIdPage() {
 
     try {
       const plainText = stripHtml(blog.content);
-      const shareText = createShareText(blog.title, plainText, 60);
+      const shareText = plainText.split(" ").slice(0, 60).join(" ") + (plainText.split(" ").length > 60 ? "…" : "");
       
       await navigator.share({
         title: blog.title,
@@ -334,10 +259,11 @@ export default function BlogIdPage() {
 
   if (!blog) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0A0E27]">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#3B82F6]"></div>
-          <div className="absolute inset-0 rounded-full bg-[#3B82F6] blur-xl opacity-20 animate-pulse"></div>
+      <div className="min-h-screen bg-cover bg-center bg-fixed relative flex items-center justify-center"
+        style={{ backgroundImage: "url('/images/nature1.jpg')" }}>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
+        <div className="relative z-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-300"></div>
         </div>
       </div>
     );
@@ -351,7 +277,7 @@ export default function BlogIdPage() {
         <meta property="og:title" content={blog.title} />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={window.location.href} />
+        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
         {blog.imageURL && <meta property="og:image" content={blog.imageURL} />}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={blog.title} />
@@ -360,335 +286,270 @@ export default function BlogIdPage() {
         <meta name="author" content={blog.author} />
       </Head>
 
-      {/* Same background as blog listing page */}
       <main
         className="min-h-screen text-white bg-cover bg-center bg-fixed relative pt-28 pb-16 px-4"
         style={{
-          backgroundImage: "url('https://res.cloudinary.com/dg7jxs7st/image/upload/v1778153542/download_1_y3x4sq.jpg')",
+          backgroundImage: "url('https://res.cloudinary.com/dg7jxs7st/image/upload/v1778231376/nli-oct-screen-res-56_p1tvuj.jpg')",
         }}
       >
-        {/* GLOBAL OVERLAY - more transparent */}
-        <div className="absolute inset-0 bg-black/30" />
+        {/* GLOBAL OVERLAY */}
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-12">
+        <div className="relative z-10 max-w-6xl mx-auto space-y-12">
+
           {/* Back Navigation */}
-          <button
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             onClick={() => router.push("/blog")}
-            className="group mb-10 text-gray-300 hover:text-[#60A5FA] font-medium flex items-center gap-2 transition-all duration-300 hover:gap-3"
+            className="text-cyan-300 hover:text-cyan-200 font-medium flex items-center gap-2 transition-colors mb-6"
           >
-            <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to all articles
-          </button>
+          </motion.button>
 
           {/* Article Header */}
-          <article>
-            <header className="mb-12">
-              <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-white leading-tight tracking-tight">
-                {blog.title}
-              </h1>
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-slate-950/90 backdrop-blur-sm border border-cyan-800 rounded-2xl p-8 md:p-12"
+          >
+            <h1 className="text-4xl md:text-6xl font-black mb-6">
+              {blog.title}
+            </h1>
 
-              {/* Meta Description - Consistent Card */}
-              {metaDescription && (
-                <div className="mb-8">
-                  <ConsistentCard className="p-8">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6]/5 to-[#2563EB]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <p className="text-lg text-gray-200 leading-relaxed relative z-10">
-                      {metaDescription}
-                    </p>
-                  </ConsistentCard>
-                </div>
-              )}
-
-              {/* Author & Date */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6 border-t border-b border-[#374151]">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-[#3B82F6] rounded-full blur-md opacity-50"></div>
-                    <div className="relative w-12 h-12 rounded-full bg-[#1E293B] flex items-center justify-center border border-[#3B82F6]/30">
-                      <span className="font-bold text-lg text-[#60A5FA]">
-                        {blog.author.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">By {blog.author}</p>
-                    <p className="text-sm text-gray-400">
-                      {formatProfessionalDate(blog.createdAt)}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Reading Time Badge */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1E293B]/50 border border-[#374151]">
-                  <svg className="w-4 h-4 text-[#60A5FA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="text-xs text-gray-400">5 min read</span>
-                </div>
-              </div>
-            </header>
-
-            {/* Featured Image - Clickable to expand */}
-            {blog.imageURL && (
-              <div className="relative mb-12 rounded-2xl overflow-hidden group cursor-pointer" onClick={() => setModalImage(blog.imageURL!)}>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E27] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
-                <img
-                  src={blog.imageURL}
-                  alt={blog.title}
-                  className="w-full h-auto max-h-[500px] object-cover transform group-hover:scale-105 transition-transform duration-700"
-                  loading="eager"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
-                  <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0A0E27] to-transparent z-10 pointer-events-none"></div>
+            {/* Meta Description */}
+            {metaDescription && (
+              <div className="mb-8">
+                <p className="text-lg md:text-xl text-cyan-100 leading-relaxed">
+                  {metaDescription}
+                </p>
               </div>
             )}
 
-            {/* Article Content - optimized for reading without straining, constant background */}
-            <div className="max-w-none">
-              <div className="space-y-8">
-                {contentParagraphs.map((paragraph, index) => {
-                  const isLastTwo = index >= contentParagraphs.length - 2;
-                  const isFirst = index === 0;
-                  
-                  return (
-                    <div 
-                      key={index}
-                      className={`
-                        leading-[1.85] text-gray-200 text-[1.125rem] md:text-[1.25rem]
-                        tracking-wide
-                        ${isFirst ? 'text-[1.35rem] md:text-[1.5rem] first-letter:text-6xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-[#60A5FA]' : ''}  
-                        ${isLastTwo ? 'relative overflow-hidden rounded-2xl p-8 mt-12 bg-[#111827]/90 border border-[#374151]' : ''}
-                      `}
-                    >
-                      {isLastTwo && (
-                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#3B82F6] to-[#2563EB]"></div>
-                      )}
-                      <div 
-                        dangerouslySetInnerHTML={{ __html: paragraph }}
-                        className={`
-                          ${isLastTwo ? 'text-[1.15rem] md:text-[1.2rem]' : ''} 
-                          text-[1.125rem] md:text-[1.25rem] leading-[1.85] tracking-wide
-
-                          [&_*]:!bg-transparent
-                          [&_*]:text-gray-200
-
-                          [&>a]:text-[#60A5FA] [&>a]:hover:text-[#93C5FD] [&>a]:transition-colors [&>a]:underline
-                          [&>strong]:text-white [&>strong]:font-semibold
-
-                          [&>h2]:text-3xl md:[&>h2]:text-4xl [&>h2]:font-bold [&>h2]:mt-10 [&>h2]:mb-5 [&>h2]:text-white
-                          [&>h3]:text-2xl md:[&>h3]:text-3xl [&>h3]:font-semibold [&>h3]:mt-8 [&>h3]:mb-4 [&>h3]:text-white
-
-                          [&>p]:mb-6 [&>p]:leading-[1.85]
-                          [&>ul]:list-disc [&>ul]:pl-8 [&>ul]:space-y-3
-                          [&>ol]:list-decimal [&>ol]:pl-8 [&>ol]:space-y-3
-
-                          [&>blockquote]:border-l-4 [&>blockquote]:border-[#3B82F6] [&>blockquote]:pl-5 [&>blockquote]:italic [&>blockquote]:text-gray-300 [&>blockquote]:my-6
-                        `}
-                      />
-                      
-                      {isLastTwo && lastTwoParagraphs && (
-                        <div className="mt-6 pt-4 border-t border-[#374151]">
-                          <div className="flex items-center gap-2 text-sm text-[#60A5FA]">
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </article>
-
-          {/* Sharing Section - With background image from Unsplash */}
-          <div 
-            className="mt-20 pt-10 relative rounded-3xl overflow-hidden"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"></div>
-            <div className="relative z-10 p-10 border-t border-[#374151]">
-              <div className="text-center mb-10">
-                <div className="inline-block mb-3 px-3 py-1 rounded-full bg-[#3B82F6]/20 border border-[#3B82F6]/40 backdrop-blur-sm">
-                  <span className="text-xs font-medium text-[#60A5FA]">Spread the word</span>
+            {/* Author & Date */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-cyan-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-cyan-600 flex items-center justify-center">
+                  <span className="font-medium text-white">
+                    {blog.author.charAt(0)}
+                  </span>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Share this article
-                </h3>
-                <p className="text-gray-300">
-                  Help others discover this gem
-                </p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
-                {/* Share with Image Button */}
-                <button
-                  onClick={() => shareWithImage(blog)}
-                  disabled={isSharing}
-                  className="group relative flex items-center justify-center gap-3 px-10 py-4 rounded-full font-semibold overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:opacity-50 w-full sm:w-auto min-w-[260px]"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#2563EB] via-[#3B82F6] to-[#1D4ED8]"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-                  {isSharing ? (
-                    <>
-                      <div className="relative w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin z-10"></div>
-                      <span className="relative z-10">Sharing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="relative w-5 h-5 group-hover:scale-110 transition-transform z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="relative z-10 text-white">Share with Image</span>
-                    </>
-                  )}
-                </button>
-                
-                {/* Share Text Only Button */}
-                <button
-                  onClick={() => shareTextContent(blog)}
-                  className="group flex items-center justify-center gap-3 px-10 py-4 bg-black/50 backdrop-blur-sm text-white border border-white/30 rounded-full font-semibold hover:bg-black/70 hover:border-white/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto min-w-[260px]"
-                >
-                  <svg className="w-5 h-5 group-hover:scale-110 transition-transform text-[#60A5FA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                  </svg>
-                  Share Text Only
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Suggested Articles - With background image from Unsplash */}
-          {suggestedBlogs.length > 0 && (
-            <section 
-              className="mt-6 relative rounded-2xl overflow-hidden"
-              style={{
-                backgroundImage: "url('https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=2070&auto=format&fit=crop')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"></div>
-              <div className="relative z-10 p-10">
-                <div className="text-center mb-12">
-                  <div className="inline-block mb-3 px-3 py-1 rounded-full bg-[#3B82F6]/20 border border-[#3B82F6]/40 backdrop-blur-sm">
-                    <span className="text-xs font-medium text-[#60A5FA]">Keep exploring</span>
-                  </div>
-                  <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-white">
-                    Continue Reading
-                  </h2>
-                  <p className="text-gray-300 max-w-md mx-auto">
-                    More stories you might enjoy from our collection
+                <div>
+                  <p className="font-medium text-cyan-300">By {blog.author}</p>
+                  <p className="text-sm text-slate-400">
+                    {formatProfessionalDate(blog.createdAt)}
                   </p>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {suggestedBlogs.map((b) => (
-                    <article
-                      key={b.id}
-                      onClick={() => handleSuggestedBlogClick(b.id)}
-                      className="group cursor-pointer rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl bg-[#111827]/90 border border-[#374151] backdrop-blur-sm"
-                    >
-                      {b.imageURL && (
-                        <div className="relative h-52 overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E27] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
-                          <img
-                            src={b.imageURL}
-                            alt={b.title}
-                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                            loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
-                          <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-black/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                            <svg className="w-5 h-5 text-[#60A5FA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="p-6">
-                        <div className="w-12 h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] mb-4 rounded-full"></div>
-                        <h3 className="font-bold text-xl mb-3 text-white group-hover:text-[#60A5FA] transition-colors line-clamp-2">
-                          {b.title}
-                        </h3>
-                        <p className="text-gray-300 text-sm mb-5 line-clamp-3 leading-relaxed">
-                          {b.description 
-                            ? getExcerpt(b.description, 20)
-                            : getExcerpt(stripHtml(b.content), 20)}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] flex items-center justify-center">
-                              <span className="text-xs font-bold text-white">{b.author.charAt(0).toUpperCase()}</span>
-                            </div>
-                            <span className="text-xs text-gray-400">
-                              {b.author}
-                            </span>
-                          </div>
-                          <span className="text-sm font-medium text-[#60A5FA] group-hover:text-[#93C5FD] group-hover:translate-x-1 transition-all duration-300">
-                            Read Article →
-                          </span>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
               </div>
-            </section>
+            </div>
+          </motion.div>
+
+          {/* Featured Image */}
+          {blog.imageURL && (
+            <motion.div
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative h-80 md:h-96 w-full rounded-2xl overflow-hidden cursor-pointer border border-cyan-800"
+              onClick={() => setActiveImage(blog.imageURL!)}
+            >
+              <Image
+                src={blog.imageURL}
+                alt={blog.title}
+                fill
+                className="object-cover hover:scale-105 transition duration-700"
+              />
+            </motion.div>
+          )}
+
+          {/* Article Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-slate-950/90 backdrop-blur-sm border border-cyan-800 rounded-2xl p-8 md:p-12"
+          >
+            <div className="space-y-6">
+              {contentParagraphs.map((paragraph, index) => (
+                <div
+                  key={index}
+                  className="text-lg md:text-xl leading-relaxed text-slate-200"
+                  dangerouslySetInnerHTML={{ __html: paragraph }}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Sharing Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="bg-slate-950/90 backdrop-blur-sm border border-cyan-800 rounded-2xl p-8 md:p-12 text-center"
+          >
+            <h3 className="text-2xl md:text-3xl font-bold text-cyan-300 mb-2">
+              Share this article
+            </h3>
+            <p className="text-slate-400 mb-8">
+              Help others discover this story
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={() => shareWithImage(blog)}
+                disabled={isSharing}
+                className="group flex items-center justify-center gap-3 px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-full font-medium transition-all duration-300 disabled:opacity-50 w-full sm:w-auto min-w-[240px]"
+              >
+                {isSharing ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Sharing...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Share with Image
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={() => shareTextContent(blog)}
+                className="group flex items-center justify-center gap-3 px-8 py-4 border-2 border-cyan-600 hover:bg-cyan-600 text-cyan-300 hover:text-white rounded-full font-medium transition-all duration-300 w-full sm:w-auto min-w-[240px]"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                Share Text Only
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Suggested Articles */}
+          {suggestedBlogs.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div className="mb-8">
+                <h2 className="text-3xl md:text-5xl font-bold text-cyan-300 mb-2">
+                  Continue Reading
+                </h2>
+                <p className="text-slate-400 text-lg">
+                  More stories you might enjoy
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {suggestedBlogs.map((b, idx) => (
+                  <motion.article
+                    key={b.id}
+                    initial={{ opacity: 0, y: 25 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.5 + idx * 0.1 }}
+                    onClick={() => handleSuggestedBlogClick(b.id)}
+                    className="group cursor-pointer bg-slate-950/90 backdrop-blur-sm border border-cyan-800 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                  >
+                    {b.imageURL && (
+                      <div className="relative h-48 overflow-hidden">
+                        <Image
+                          src={b.imageURL}
+                          alt={b.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    
+                    <div className={`p-6 ${!b.imageURL ? 'pt-6' : ''}`}>
+                      <h3 className="font-bold text-xl mb-3 text-cyan-300 group-hover:text-cyan-200 transition-colors line-clamp-2">
+                        {b.title}
+                      </h3>
+                      <p className="text-slate-400 text-sm mb-4 line-clamp-3">
+                        {b.description 
+                          ? getExcerpt(b.description, 20)
+                          : getExcerpt(stripHtml(b.content), 20)}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-500">
+                          By {b.author}
+                        </span>
+                        <span className="text-sm font-medium text-cyan-400 group-hover:translate-x-1 transition-transform">
+                          Read →
+                        </span>
+                      </div>
+                    </div>
+                  </motion.article>
+                ))}
+              </div>
+            </motion.section>
           )}
 
           {/* Bottom CTA */}
-          <div className="mt-24 pt-12 border-t border-[#374151] text-center">
-            <ConsistentCard className="p-10 overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#3B82F6]/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#1D4ED8]/10 rounded-full blur-3xl"></div>
-              
-              <div className="relative z-10">
-                <p className="text-gray-300 mb-6 text-xl">
-                  Enjoyed this article? <span className="text-[#60A5FA] font-semibold">Explore more insights</span>
-                </p>
-                <button
-                  onClick={() => router.push("/blog")}
-                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] rounded-full font-semibold text-white hover:shadow-2xl hover:scale-105 transition-all duration-300"
-                >
-                  <svg className="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                  </svg>
-                  View All Articles
-                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            </ConsistentCard>
-          </div>
-        </div>
-      </main>
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="bg-slate-950/90 backdrop-blur-sm border border-cyan-800 rounded-2xl p-8 md:p-12 text-center"
+          >
+            <p className="text-slate-300 text-lg md:text-xl mb-6">
+              Enjoyed this article? Explore more insights
+            </p>
+            <button
+              onClick={() => router.push("/blog")}
+              className="inline-flex items-center gap-3 px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-full font-medium transition-all duration-300"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+              View All Articles
+            </button>
+          </motion.div>
 
-      {/* Image Modal */}
-      {modalImage && (
-        <ImageModal 
-          imageUrl={modalImage} 
-          alt={blog.title} 
-          onClose={() => setModalImage(null)} 
-        />
-      )}
+        </div>
+
+        {/* Image Lightbox */}
+        <AnimatePresence>
+          {activeImage && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveImage(null)}
+            >
+              <motion.div
+                className="relative w-full max-w-6xl h-[85vh]"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.8 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  src={activeImage}
+                  alt="preview"
+                  fill
+                  className="object-contain rounded-xl"
+                />
+
+                <button
+                  onClick={() => setActiveImage(null)}
+                  className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white px-5 py-2 rounded-full text-lg font-medium transition"
+                >
+                  Close ✕
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
     </>
   );
 }

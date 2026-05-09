@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import AboutPreview from "@/components/public/AboutPreview";
-
+import MaxwellOkothBiography from "@/components/public/MaxwellOkothBiography";
 /* ================= COMPONENTS ================= */
 import Hero from "@/components/public/HeroBanner";
 import BlogList from "@/components/public/BlogList";
@@ -29,14 +29,10 @@ export default function HomePage() {
         <Hero />
 
         {/* ================= YOUTUBE ================= */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#0B1220] text-white">
+        <section className="py-16 px-4 sm:px-3 lg:px-8 bg-[#0B1220] text-white">
           <div className="max-w-6xl mx-auto text-center">
 
-            <SectionTitle
-              title="Latest Video Messages"
-              subtitle="Watch sermons, teachings, and mission highlights"
-              variant="dark"
-            />
+           
 
             <motion.div
               className="mt-10"
@@ -87,32 +83,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ================= LIBRARY ================= */}
-        <section className="py-14 px-4 sm:px-6 lg:px-8 bg-[#0B1220]">
-          <div className="max-w-6xl mx-auto">
-
-            <SectionTitle
-              title="Bible Study Library"
-              subtitle="Deep studies, downloadable materials, and references"
-              variant="dark"
-            />
-
-            <div className="mt-8">
-              <LibraryList maxDocs={6} />
-            </div>
-
-            <div className="mt-8 text-center">
-              <Link
-                href="/library"
-                className="inline-block bg-cyan-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-cyan-600 transition"
-              >
-                EXPLORE LIBRARY →
-              </Link>
-            </div>
-
-          </div>
-        </section>
+        
 <TrueEducationMessage />
+   <MaxwellOkothBiography />
         {/* ================= CTA ================= */}
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#020617] border-t border-cyan-500/10">
           <div className="max-w-4xl mx-auto text-center">

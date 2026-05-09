@@ -35,7 +35,7 @@ export default function YoutubeCarousel() {
 
   return (
     <main
-      className="min-h-screen relative overflow-hidden bg-cover bg-center bg-fixed pt-28 pb-20"
+      className="min-h-screen relative overflow-hidden bg-cover bg-center bg-fixed pt-12 pb-15"
       style={{
         backgroundImage: "url('/images/nature1.jpg')",
       }}
