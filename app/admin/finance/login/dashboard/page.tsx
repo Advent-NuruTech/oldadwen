@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from "react";
 
-import FinanceCategoriesView from "@/app/admin/finance/categories";
-import FinanceDashboardView from "@/app/admin/finance/dashboard";
-import FinanceNotificationsView from "@/app/admin/finance/notifications";
-import FinancePaymentMethodsView from "@/app/admin/finance/payment-methods";
-import FinanceReceiptsView from "@/app/admin/finance/receipts";
-import FinanceReportsView from "@/app/admin/finance/reports";
-import FinanceStructureView from "@/app/admin/finance/structure";
-import FinanceTransactionsView from "@/app/admin/finance/transactions";
+import FinanceCategoriesView from "@/app/admin/finance/login/dashboard/categories";
+import FinanceDashboardView from "@/app/admin/finance/login/dashboard/dashboard";
+import FinanceNotificationsView from "@/app/admin/finance/login/dashboard/notifications";
+import FinancePaymentMethodsView from "@/app/admin/finance/login/dashboard/payment-methods";
+import FinanceReceiptsView from "@/app/admin/finance/login/dashboard/receipts";
+import FinanceReportsView from "@/app/admin/finance/login/dashboard/reports";
+import FinanceStructureView from "@/app/admin/finance/login/dashboard/structure";
+import FinanceTransactionsView from "@/app/admin/finance/login/dashboard/transactions";
 import { useFinanceNotifications } from "@/hooks/useFinanceNotifications";
 
 type TabKey =
@@ -28,9 +28,10 @@ const tabs: Array<{ key: TabKey; label: string }> = [
   { key: "transactions", label: "Transactions" },
   { key: "categories", label: "Categories" },
   { key: "payments", label: "Payment Methods" },
-  { key: "notifications", label: "Notifications" },
   { key: "receipts", label: "Receipts" },
   { key: "reports", label: "Reports" },
+  { key: "notifications", label: "🔕" },
+  
 ];
 
 export default function AdminFinancePage() {

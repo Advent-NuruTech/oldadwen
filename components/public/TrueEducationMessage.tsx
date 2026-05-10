@@ -9,10 +9,10 @@ export default function TrueEducationMessage() {
   const [imageView, setImageView] = useState<string | null>(null);
 
   const images = {
-    hero: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+    hero: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778402052/ChatGPT_Image_May_10_2026_11_33_40_AM_nnp599.png",
     farm: "https://images.unsplash.com/photo-1507692049790-de58290a4334",
-    bible: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65",
-    mission: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    bible: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778402052/ChatGPT_Image_May_10_2026_11_33_40_AM_nnp599.png",
+    mission: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778081768/10_uayy12.jpg",
   };
 
   return (

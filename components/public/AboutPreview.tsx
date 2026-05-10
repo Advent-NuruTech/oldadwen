@@ -26,7 +26,7 @@ export default function AboutPreview() {
     },
     {
       title: "Rapid Mission Growth",
-      subtitle: "Baptized & 900 Under Instruction",
+      subtitle: "God Leads His  Dear Children a long",
       description:
         "From humble beginnings in 2018 to a movement spanning across Kenya and beyond — raising missionaries, planting churches, and preparing a people for the Latter Rain.",
       image:

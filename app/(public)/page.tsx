@@ -27,7 +27,10 @@ export default function HomePage() {
 
         {/* ================= HERO ================= */}
         <Hero />
-
+<AboutPreview />
+    
+<TrueEducationMessage />
+   <MaxwellOkothBiography />
         {/* ================= YOUTUBE ================= */}
         <section className="py-16 px-4 sm:px-3 lg:px-8 bg-[#0B1220] text-white">
           <div className="max-w-6xl mx-auto text-center">
@@ -56,7 +59,7 @@ export default function HomePage() {
 
           </div>
         </section>
-<AboutPreview />
+
         {/* ================= BLOG ================= */}
         <section className="py-14 px-4 sm:px-6 lg:px-8 bg-[#0F172A]">
           <div className="max-w-6xl mx-auto">
@@ -68,7 +71,7 @@ export default function HomePage() {
             />
 
             <div className="mt-8">
-              <BlogList maxBlogs={6} />
+              <BlogList maxBlogs={2} />
             </div>
 
             <div className="mt-8 text-center">
@@ -83,9 +86,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        
-<TrueEducationMessage />
-   <MaxwellOkothBiography />
+    
         {/* ================= CTA ================= */}
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#020617] border-t border-cyan-500/10">
           <div className="max-w-4xl mx-auto text-center">

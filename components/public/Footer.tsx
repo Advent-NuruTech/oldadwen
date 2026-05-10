@@ -107,10 +107,10 @@ export default function Footer() {
 
             {/* SOCIAL */}
             <div className="flex gap-3 mt-4">
-              <a href="https://facebook.com/groups/435293693285693" target="_blank">
+              <a href="#" target="_blank">
                 <FaFacebookF />
               </a>
-              <a href="https://wa.me/254722878683" target="_blank">
+              <a href="#">
                 <FaWhatsapp />
               </a>
               <a href="#">

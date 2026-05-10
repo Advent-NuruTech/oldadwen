@@ -9,10 +9,10 @@ export default function MaxwellOkothBiography() {
   const [imageView, setImageView] = useState<string | null>(null);
 
   const images = {
-    hero: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778068473/mcl5tityr4ls8vj2z9gj.png",
+    hero: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778401463/max_qctewh.jpg",
     portrait: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778081726/6_vm49x1.jpg",
-    baptism: "https://images.unsplash.com/photo-1507692049790-de58290a4334",
-    ministry: "https://images.unsplash.com/photo-1529070538774-1843cb3265df",
+    baptism: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778401463/max_qctewh.jpg",
+    ministry: "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778401686/WhatsApp_Image_2026-05-05_at_20.20.56_uyrd2t.jpg",
   };
 
   return (
