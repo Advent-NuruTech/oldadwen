@@ -2,7 +2,7 @@
 
 export default function TermsOfUsePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#020617] via-[#0b1220] to-[#020617] text-white px-6 py-16">
+    <main className="min-h-screen bg-gradient-to-b from-[#020617] via-[#0b1220] to-[#020617] text-white px-6 py-24">
 
       <section className="max-w-6xl mx-auto space-y-14">
 

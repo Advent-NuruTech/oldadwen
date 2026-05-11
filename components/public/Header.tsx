@@ -7,13 +7,9 @@ import { usePathname } from "next/navigation";
 import {
   FaUsers,
   FaBars,
-  FaHome,
-  FaBookOpen,
-  FaWater,
-  FaPrayingHands,
-  FaDonate,
   FaChevronDown,
 } from "react-icons/fa";
+
 import Sidebar from "./SideBar";
 
 export default function Navbar() {
@@ -26,33 +22,66 @@ export default function Navbar() {
   const aboutRef = useRef<HTMLDivElement>(null);
 
   const handleNavigation = () => setLoading(true);
-  useEffect(() => setLoading(false), [pathname]);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    setLoading(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
     window.addEventListener("scroll", handleScroll);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (aboutRef.current && !aboutRef.current.contains(e.target as Node)) {
+      if (
+        aboutRef.current &&
+        !aboutRef.current.contains(e.target as Node)
+      ) {
         setAboutOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+    };
   }, []);
 
   const isActive = (href: string) => pathname === href;
 
+  /* DESKTOP NAV ITEMS */
   const publicNavItems = [
-    { href: "/", label: "Home", icon: FaHome },
-    { href: "/sabbath-school", label: "Sabbath School", icon: FaUsers },
-    { href: "/library", label: "Library", icon: FaBookOpen },
-    { href: "/blog", label: "Blog", icon: FaWater },
-    { href: "/finance", label: "GIVE", icon: FaDonate },
-    { href: "/prayer", label: "Prayer Request", icon: FaPrayingHands },
+    {
+      href: "/",
+      label: "Home",
+    },
+    {
+      href: "/sabbath-school",
+      label: "Sabbath School",
+    },
+    {
+      href: "/library",
+      label: "Library",
+    },
+    {
+      href: "/blog",
+      label: "Blog",
+    },
+    {
+      href: "/finance",
+      label: "GIVE",
+    },
+    {
+      href: "/prayer",
+      label: "Prayer Request",
+    },
   ];
 
   return (
@@ -86,6 +115,7 @@ export default function Navbar() {
                 <h1 className="text-xl font-extrabold text-gray-900">
                   Old SDA
                 </h1>
+
                 <p className="text-xs text-gray-500 -mt-1">
                   Restoring Adventism
                 </p>
@@ -106,7 +136,9 @@ export default function Navbar() {
                   }`}
                 >
                   <FaUsers />
+
                   About
+
                   <FaChevronDown
                     className={`text-xs transition-transform ${
                       aboutOpen ? "rotate-180" : ""
@@ -119,14 +151,15 @@ export default function Navbar() {
                     <Link
                       href="/about"
                       onClick={() => setAboutOpen(false)}
-                      className="block px-4 py-2 text-sm hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100 transition"
                     >
                       About Us
                     </Link>
+
                     <Link
                       href="/members"
                       onClick={() => setAboutOpen(false)}
-                      className="block px-4 py-2 text-sm hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100 transition"
                     >
                       Our Team
                     </Link>
@@ -140,19 +173,18 @@ export default function Navbar() {
                   key={item.href}
                   href={item.href}
                   onClick={handleNavigation}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition ${
                     isActive(item.href)
                       ? "text-blue-700 bg-blue-50"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  <item.icon />
                   {item.label}
                 </Link>
               ))}
             </div>
 
-            {/* MOBILE */}
+            {/* MOBILE MENU BUTTON */}
             <div className="lg:hidden">
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -161,6 +193,7 @@ export default function Navbar() {
                 <FaBars className="text-xl text-gray-700" />
               </button>
             </div>
+
           </div>
         </div>
 
@@ -170,19 +203,14 @@ export default function Navbar() {
         )}
       </nav>
 
+      {/* SPACER */}
       <div className="h-20" />
 
-      {sidebarOpen && (
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          publicNavItems={[
-            { href: "/about", label: "About Us", icon: FaUsers },
-            { href: "/members", label: "Our Team", icon: FaUsers },
-            ...publicNavItems,
-          ]}
-        />
-      )}
+      {/* SIDEBAR */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
     </>
   );
 }

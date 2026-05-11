@@ -2,7 +2,7 @@
 
 export default function CookiesPolicyPage() {
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-[#1F1A16] px-6 py-12">
+    <main className="min-h-screen bg-gray-50 dark:bg-[#1F1A16] px-6 py-24">
       <section className="max-w-5xl mx-auto space-y-12">
 
         {/* Title */}

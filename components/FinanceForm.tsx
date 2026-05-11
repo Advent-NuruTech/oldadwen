@@ -115,7 +115,7 @@ export default function FinanceForm({
 
         {(selectedCategory?.type === "campaign" || selectedCategory?.type === "donation") && (
           <input
-            placeholder="Purpose (optional)"
+            placeholder="Purpose "
             value={value.purpose || ""}
             onChange={(event) => onChange({ purpose: event.target.value, donorType })}
             className="w-full mt-3 border border-slate-300 rounded-lg p-2.5 sm:p-3 text-sm sm:text-base text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
@@ -139,7 +139,7 @@ export default function FinanceForm({
 
       {/* Personal Details Section - Always visible with responsive grid */}
       <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
-        <h3 className="font-semibold text-slate-900 text-base sm:text-lg mb-3">Personal Details (optional)</h3>
+        <h3 className="font-semibold text-slate-900 text-base sm:text-lg mb-3">Personal Details (.)</h3>
 
         {/* Improved responsive grid - always shows inputs properly */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

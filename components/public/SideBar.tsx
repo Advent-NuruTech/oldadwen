@@ -4,23 +4,31 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { FaTimes } from "react-icons/fa";
+
+import {
+  FaTimes,
+  FaHome,
+  FaBookOpen,
+  FaNewspaper,
+  FaDonate,
+  FaPrayingHands,
+  FaUsers,
+} from "react-icons/fa";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  publicNavItems: { href: string; label: string; icon: any }[];
 }
 
 export default function Sidebar({
   isOpen,
   onClose,
-  publicNavItems,
 }: SidebarProps) {
   const pathname = usePathname();
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
+
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -31,6 +39,50 @@ export default function Sidebar({
   if (!isOpen) return null;
 
   const handleLink = () => onClose();
+
+  /* SIDEBAR NAV ITEMS */
+  const navItems = [
+    {
+      href: "/",
+      label: "Home",
+      icon: FaHome,
+    },
+    {
+      href: "/about",
+      label: "About Us",
+      icon: FaUsers,
+    },
+    {
+      href: "/members",
+      label: "Our Team",
+      icon: FaUsers,
+    },
+    {
+      href: "/sabbath-school",
+      label: "Sabbath School",
+      icon: FaBookOpen,
+    },
+    {
+      href: "/library",
+      label: "Library",
+      icon: FaBookOpen,
+    },
+    {
+      href: "/blog",
+      label: "Blog",
+      icon: FaNewspaper,
+    },
+    {
+      href: "/finance",
+      label: "Give",
+      icon: FaDonate,
+    },
+    {
+      href: "/prayer",
+      label: "Prayer Request",
+      icon: FaPrayingHands,
+    },
+  ];
 
   return (
     <>
@@ -87,7 +139,7 @@ export default function Sidebar({
           {/* NAVIGATION */}
           <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-2">
 
-            {publicNavItems.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

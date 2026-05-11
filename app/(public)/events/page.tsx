@@ -53,7 +53,7 @@ export default function EventsPage() {
         <div className="flex items-center justify-between flex-wrap gap-3">
 
           <h1 className="text-2xl font-bold">
-            Church <span className="text-cyan-400">Hub</span>
+            Church <span className="text-cyan-400">Activities </span>
           </h1>
 
           <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export default function EventsPage() {
             </Link>
 
             <Link
-              href="/calendar/list"
+              href="/calendar"
               className="px-4 py-2 rounded-full text-sm font-semibold border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 transition"
             >
               Calendar
