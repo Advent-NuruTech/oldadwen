@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     url: "https://oldsda.org",
     title: "OLD SEVENTH DAY ADVENTISTS ORGANIZATION",
     description:
-      "A Bible-based reform movement restoring pioneer Adventist faith, proclaiming the One True God, rejecting the Trinity, and advancing the Three Angels’ Messages worldwide.",
+      "official website for a Bible-based reform movement restoring pioneer Seventh Day Adventist faith, proclaiming the everlasting gospel given by one True God. preparing a people to meet their King.",
     siteName: "OLD SEVENTH DAY ADVENTISTS ORGANIZATION",
     images: [
       {
