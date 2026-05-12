@@ -104,19 +104,12 @@ export default function YoutubeCarousel() {
 
                     {/* FOOTER */}
                     <div className="p-5">
-                      <h2 className="text-white font-bold text-lg md:text-xl line-clamp-2">
-                        Old SDA Video Message
-                      </h2>
+                     
 
-                      <p className="text-slate-300 mt-3 text-sm md:text-base leading-relaxed">
-                        Watch and share present truth messages, missionary
-                        reports, campmeetings, Bible studies and gospel outreach
-                        content.
-                      </p>
 
                       <div className="mt-5 flex items-center justify-between">
                         <span className="text-cyan-300 text-sm font-semibold">
-                          Gospel Media
+                          present truth
                         </span>
 
                         <a

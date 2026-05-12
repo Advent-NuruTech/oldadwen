@@ -76,7 +76,7 @@ export default function Navbar() {
     },
     {
       href: "/finance",
-      label: "GIVE",
+      label: "DONATE",
     },
     {
       href: "/prayer",

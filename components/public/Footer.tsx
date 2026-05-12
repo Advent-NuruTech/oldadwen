@@ -102,7 +102,7 @@ export default function Footer() {
             <div className="space-y-2 text-gray-300 font-medium">
               <p>Kenya</p>
               <p>oldsdaorganization@gmail.com</p>
-              <p>+254 722 878683</p>
+              <p>+254 724403284 </p>
             </div>
 
             {/* SOCIAL */}

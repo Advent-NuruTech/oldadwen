@@ -123,6 +123,15 @@ export default function HeroBanner() {
               <Link className="border border-cyan-300 px-5 py-3 rounded-lg text-cyan-100 font-semibold hover:bg-cyan-300/10 transition-colors" href="/calendar">
                 Calendar
               </Link>
+
+ <Link className="border border-cyan-300 px-5 py-3 rounded-lg text-cyan-100 font-semibold hover:bg-cyan-300/10 transition-colors" href="/reports">
+                Reports
+              </Link>
+
+ <Link className="border border-cyan-300 px-5 py-3 rounded-lg text-cyan-100 font-semibold hover:bg-cyan-300/10 transition-colors" href="/finance">
+                DONATE
+              </Link>
+
             </div>
           </div>
 

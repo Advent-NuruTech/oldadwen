@@ -79,7 +79,7 @@ export default function Sidebar({
     },
     {
       href: "/finance",
-      label: "Give",
+      label: "DONATE",
       icon: FaDonate,
     },
     {

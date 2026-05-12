@@ -14,7 +14,7 @@ interface Minister {
   metadata: string;
   role?: string;
   title?: string;
-  expertise?: string;
+
   joinedDate?: string;
 }
 
@@ -29,7 +29,7 @@ export default function EditFullTimeMinistersPage() {
       metadata: string;
       role: string;
       title: string;
-      expertise: string;
+    
       joinedDate: string;
     };
   }>({});
@@ -46,7 +46,7 @@ export default function EditFullTimeMinistersPage() {
         metadata: d.data().metadata,
         role: d.data().role || "",
         title: d.data().title || "",
-        expertise: d.data().expertise || "",
+       
         joinedDate: d.data().joinedDate || "",
       })) as Minister[];
 
@@ -60,7 +60,7 @@ export default function EditFullTimeMinistersPage() {
           metadata: m.metadata,
           role: m.role || "",
           title: m.title || "",
-          expertise: m.expertise || "",
+        
           joinedDate: m.joinedDate || "",
         };
       });
@@ -89,7 +89,7 @@ export default function EditFullTimeMinistersPage() {
         metadata: state.metadata,
         role: state.role,
         title: state.title,
-        expertise: state.expertise,
+     
         joinedDate: state.joinedDate,
         isFullTime: true,
       });
@@ -104,7 +104,7 @@ export default function EditFullTimeMinistersPage() {
                 metadata: state.metadata,
                 role: state.role,
                 title: state.title,
-                expertise: state.expertise,
+                
                 joinedDate: state.joinedDate,
               }
             : m,
@@ -222,18 +222,7 @@ export default function EditFullTimeMinistersPage() {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    value={state.expertise}
-                    onChange={(e) =>
-                      setEditingStates((prev) => ({
-                        ...prev,
-                        [minister.id]: { ...prev[minister.id], expertise: e.target.value },
-                      }))
-                    }
-                    className="w-full p-3 rounded-lg bg-[#1E293B]/60 text-white border border-[#334155]"
-                    placeholder="Expertise"
-                  />
+                 
                   <input
                     type="text"
                     value={state.joinedDate}

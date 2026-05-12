@@ -12,7 +12,7 @@ export default function AboutPreview() {
       description:
         "We stand firmly on the original teachings of the Seventh-day Adventist pioneers, rejecting modern unbiblical changes and restoring the faith once delivered unto the saints.",
       image:
-        "https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop",
+        "https://res.cloudinary.com/dg7jxs7st/image/upload/v1778401686/WhatsApp_Image_2026-05-05_at_20.20.56_uyrd2t.jpg",
       highlights: [
         "Three Angels' Messages",
         "The Sanctuary and the Investigative Judgment",

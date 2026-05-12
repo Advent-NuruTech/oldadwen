@@ -180,12 +180,7 @@ export default function FinancePage() {
               <p className="mt-2 text-sm text-slate-300">Transparent giving system for tithes, offerings, and donations.</p>
             </div>
 
-            <Link
-              href="/admin/finance/login"
-              className="inline-flex items-center rounded-lg border border-cyan-400/60 px-4 py-2 text-sm font-semibold text-cyan-200 hover:bg-cyan-500/10"
-            >
-              Finance Admin Login
-            </Link>
+            
           </div>
         </header>
 

@@ -32,7 +32,7 @@ interface FullTimeMinisterData {
   metadata: string;
   role: string;
   title: string;
-  
+
   
   isFullTime: boolean;
   joinedDate: string;
@@ -49,7 +49,7 @@ export default function AddFullTimeMinisterPage() {
 
   // Full-Time Minister specific fields
   const [title, setTitle] = useState("");
-  const [expertise, setExpertise] = useState("");
+ 
   const [joinedDate, setJoinedDate] = useState("");
   const [ministryFocus, setMinistryFocus] = useState("");
 
@@ -154,7 +154,7 @@ export default function AddFullTimeMinisterPage() {
       setMetadata("");
       setRole("");
       setTitle("");
-      setExpertise("");
+     
       setJoinedDate("");
       setMinistryFocus("");
 

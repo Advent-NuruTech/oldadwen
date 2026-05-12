@@ -110,28 +110,44 @@ export default function MembersPage() {
                 <Link
                   key={member.id}
                   href={`/members/${member.id}`}
-                  className="group block rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl bg-slate-950/80 border border-slate-800 backdrop-blur-sm"
+                  className="group block rounded-1xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl bg-slate-950/80 border border-slate-800 backdrop-blur-sm"
                 >
-                  {/* Image section */}
-                  {member.imageUrl && (
-                    <div className="relative h-64 overflow-hidden bg-slate-900">
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
-                      <img
-                        src={member.imageUrl}
-                        alt={member.name}
-                        className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700 p-4"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                      <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-slate-950/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 border border-cyan-500/30">
-                        <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
+            {/* Image section */}
+{member.imageUrl && (
+  <div className="relative w-full bg-slate-900 flex items-center justify-center overflow-hidden">
+
+    {/* subtle overlay like ministers page */}
+    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-40" />
+
+    <img
+      src={member.imageUrl}
+      alt={member.name}
+      className="w-full h-auto max-h-[420px] object-contain transition-transform duration-700 group-hover:scale-105"
+      loading="lazy"
+      onError={(e) => {
+        e.currentTarget.style.display = "none";
+      }}
+    />
+
+    {/* hover icon (kept consistent but cleaner) */}
+    <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-slate-950/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 border border-cyan-500/30">
+      <svg
+        className="w-5 h-5 text-cyan-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M14 5l7 7m0 0l-7 7m7-7H3"
+        />
+      </svg>
+    </div>
+
+  </div>
+)}
                   
                   <div className="p-6">
                     <div className="w-16 h-0.5 bg-gradient-to-r from-cyan-500 to-cyan-700 mb-5 rounded-full"></div>
