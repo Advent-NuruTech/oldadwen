@@ -7,6 +7,7 @@ import FinanceDashboardView from "@/app/admin/finance/login/dashboard/dashboard"
 import FinanceNotificationsView from "@/app/admin/finance/login/dashboard/notifications";
 import FinancePaymentMethodsView from "@/app/admin/finance/login/dashboard/payment-methods";
 import FinanceReceiptsView from "@/app/admin/finance/login/dashboard/receipts";
+import FinanceReportCommentsView from "@/app/admin/finance/login/dashboard/report-comments";
 import FinanceReportsView from "@/app/admin/finance/login/dashboard/reports";
 import FinanceStructureView from "@/app/admin/finance/login/dashboard/structure";
 import FinanceTransactionsView from "@/app/admin/finance/login/dashboard/transactions";
@@ -20,7 +21,8 @@ type TabKey =
   | "payments"
   | "notifications"
   | "receipts"
-  | "reports";
+  | "reports"
+  | "reportComments";
 
 const tabs: Array<{ key: TabKey; label: string }> = [
   { key: "dashboard", label: "Dashboard" },
@@ -30,6 +32,7 @@ const tabs: Array<{ key: TabKey; label: string }> = [
   { key: "payments", label: "Payment Methods" },
   { key: "receipts", label: "Receipts" },
   { key: "reports", label: "Reports" },
+  { key: "reportComments", label: "Report Comments" },
   { key: "notifications", label: "🔕" },
   
 ];
@@ -56,6 +59,8 @@ export default function AdminFinancePage() {
         return <FinanceReceiptsView />;
       case "reports":
         return <FinanceReportsView />;
+      case "reportComments":
+        return <FinanceReportCommentsView />;
       default:
         return null;
     }

@@ -1,9 +1,60 @@
-"use client";
+﻿"use client";
 
-import { useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 
 import { useFinanceRealtimeData } from "@/hooks/useFinanceRealtimeData";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { buildFinancePdf, downloadPdfReport, ReportScope } from "@/lib/pdfGenerator";
+
+type ReportLink = {
+  title: string;
+  url: string;
+};
+
+type PublicReport = {
+  id: string;
+  title: string;
+  content: string;
+  images: string[];
+  links: ReportLink[];
+  donationLinks?: string;
+  authorName?: string;
+  authorTitle?: string;
+  publishedDate?: string | null;
+  createdAt?: string | null;
+};
+
+const MAX_REPORT_IMAGES = 6;
+
+function toInputDate(value?: string | null): string {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function serializeLinks(links: ReportLink[]): string {
+  return links.map((link) => `${link.title}|${link.url}`).join("\n");
+}
+
+function parseLinks(raw: string): ReportLink[] {
+  return raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [title, ...urlParts] = line.split("|");
+      return {
+        title: (title || "").trim(),
+        url: urlParts.join("|").trim(),
+      };
+    })
+    .filter((entry) => entry.title && entry.url);
+}
 
 export default function FinanceReportsView() {
   const { conferences, regions, churches, transactions } = useFinanceRealtimeData({ includeReceipts: false });
@@ -14,6 +65,23 @@ export default function FinanceReportsView() {
   const [churchId, setChurchId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const [reports, setReports] = useState<PublicReport[]>([]);
+  const [reportsLoading, setReportsLoading] = useState(true);
+  const [reportsError, setReportsError] = useState<string | null>(null);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [authorTitle, setAuthorTitle] = useState("");
+  const [publishedDate, setPublishedDate] = useState("");
+  const [donationLinks, setDonationLinks] = useState("");
+  const [linksInput, setLinksInput] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     return transactions.filter((tx) => {
@@ -115,11 +183,160 @@ export default function FinanceReportsView() {
     downloadPdfReport(blob, `finance-report-${scope}.pdf`);
   };
 
+  const loadReports = async () => {
+    setReportsLoading(true);
+    setReportsError(null);
+
+    try {
+      const response = await fetch("/api/reports", { cache: "no-store" });
+      if (!response.ok) throw new Error("Failed to load reports");
+      const payload = (await response.json()) as PublicReport[];
+      setReports(payload);
+    } catch (error) {
+      console.error(error);
+      setReportsError("Failed to load public reports.");
+    } finally {
+      setReportsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReports();
+  }, []);
+
+  const resetForm = () => {
+    setEditingId(null);
+    setTitle("");
+    setContent("");
+    setAuthorName("");
+    setAuthorTitle("");
+    setPublishedDate("");
+    setDonationLinks("");
+    setLinksInput("");
+    setImageUrls([]);
+    setStatusMessage(null);
+  };
+
+  const editReport = (report: PublicReport) => {
+    setEditingId(report.id);
+    setTitle(report.title || "");
+    setContent(report.content || "");
+    setAuthorName(report.authorName || "");
+    setAuthorTitle(report.authorTitle || "");
+    setPublishedDate(toInputDate(report.publishedDate || report.createdAt || null));
+    setDonationLinks(report.donationLinks || "");
+    setLinksInput(serializeLinks(report.links || []));
+    setImageUrls(Array.isArray(report.images) ? report.images.slice(0, MAX_REPORT_IMAGES) : []);
+    setStatusMessage(null);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const deleteReport = async (report: PublicReport) => {
+    const confirmed = window.confirm(`Delete report \"${report.title}\"?`);
+    if (!confirmed) return;
+
+    try {
+      const params = new URLSearchParams({ id: report.id });
+      (report.images || []).forEach((image) => {
+        params.append("image", image);
+      });
+
+      const response = await fetch(`/api/reports?${params.toString()}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete report");
+
+      if (editingId === report.id) resetForm();
+      await loadReports();
+      setStatusMessage("Report deleted.");
+    } catch (error) {
+      console.error(error);
+      setStatusMessage("Unable to delete report.");
+    }
+  };
+
+  const saveReport = async () => {
+    if (!title.trim() || !content.trim()) {
+      setStatusMessage("Title and report content are required.");
+      return;
+    }
+
+    setSaving(true);
+    setStatusMessage(null);
+
+    try {
+      const body = {
+        id: editingId || undefined,
+        title: title.trim(),
+        content: content.trim(),
+        authorName: authorName.trim(),
+        authorTitle: authorTitle.trim(),
+        publishedDate: publishedDate || undefined,
+        donationLinks: donationLinks.trim(),
+        links: parseLinks(linksInput),
+        images: imageUrls.slice(0, MAX_REPORT_IMAGES),
+      };
+
+      const response = await fetch("/api/reports", {
+        method: editingId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) throw new Error("Failed to save report");
+
+      await loadReports();
+      resetForm();
+      setStatusMessage(editingId ? "Report updated successfully." : "Report published successfully.");
+    } catch (error) {
+      console.error(error);
+      setStatusMessage("Unable to save report.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleImagesSelected = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    if (imageUrls.length >= MAX_REPORT_IMAGES) {
+      setStatusMessage(`Only ${MAX_REPORT_IMAGES} images are allowed per report.`);
+      event.target.value = "";
+      return;
+    }
+
+    const availableSlots = MAX_REPORT_IMAGES - imageUrls.length;
+    const fileBatch = Array.from(files).slice(0, availableSlots);
+
+    setUploadingImages(true);
+    setStatusMessage(null);
+
+    try {
+      const uploaded = await Promise.all(fileBatch.map((file) => uploadToCloudinary(file)));
+      setImageUrls((prev) => [...prev, ...uploaded].slice(0, MAX_REPORT_IMAGES));
+      if (files.length > availableSlots) {
+        setStatusMessage(`Only ${MAX_REPORT_IMAGES} images are allowed. Extra files were ignored.`);
+      }
+    } catch (error) {
+      console.error(error);
+      setStatusMessage("One or more images failed to upload.");
+    } finally {
+      setUploadingImages(false);
+      event.target.value = "";
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setImageUrls((prev) => prev.filter((entry) => entry !== url));
+  };
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900">Reports</h2>
 
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+        <h3 className="text-lg font-semibold text-slate-900">Financial PDF Reports</h3>
+
         <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
           <label className="block text-sm font-medium text-slate-700">
             <span>Scope</span>
@@ -172,6 +389,160 @@ export default function FinanceReportsView() {
           </table>
         </section>
       )}
+
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-slate-900">Public Written Reports</h3>
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
+            >
+              Cancel Editing
+            </button>
+          )}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="block text-sm font-medium text-slate-700">
+            <span>Report Title</span>
+            <input value={title} onChange={(event) => setTitle(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Quarterly Mission Progress Report" />
+          </label>
+
+          <label className="block text-sm font-medium text-slate-700">
+            <span>Publish Date</span>
+            <input type="date" value={publishedDate} onChange={(event) => setPublishedDate(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" />
+          </label>
+
+          <label className="block text-sm font-medium text-slate-700">
+            <span>Published By (Name)</span>
+            <input value={authorName} onChange={(event) => setAuthorName(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Elder John Doe" />
+          </label>
+
+          <label className="block text-sm font-medium text-slate-700">
+            <span>Publisher Title</span>
+            <input value={authorTitle} onChange={(event) => setAuthorTitle(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Finance Director" />
+          </label>
+        </div>
+
+        <label className="block text-sm font-medium text-slate-700">
+          <span>Report Body</span>
+          <textarea value={content} onChange={(event) => setContent(event.target.value)} className="mt-1 h-56 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Write the full report here..." />
+        </label>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="block text-sm font-medium text-slate-700">
+            <span>Reference Links (one per line as: title|url)</span>
+            <textarea value={linksInput} onChange={(event) => setLinksInput(event.target.value)} className="mt-1 h-24 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Mission Album|https://example.com/album" />
+          </label>
+
+          <label className="block text-sm font-medium text-slate-700">
+            <span>Donation / CTA Links (optional)</span>
+            <textarea value={donationLinks} onChange={(event) => setDonationLinks(event.target.value)} className="mt-1 h-24 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Any extra giving info or links" />
+          </label>
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-slate-700">Images ({imageUrls.length}/{MAX_REPORT_IMAGES})</p>
+            <label className="inline-flex cursor-pointer rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
+              {uploadingImages ? "Uploading..." : "Add Images"}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImagesSelected}
+                className="hidden"
+                disabled={uploadingImages || imageUrls.length >= MAX_REPORT_IMAGES}
+              />
+            </label>
+          </div>
+
+          {imageUrls.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              {imageUrls.map((image) => (
+                <div key={image} className="space-y-2 rounded-lg border border-slate-200 p-2">
+                  <img src={image} alt="Report upload" className="h-24 w-full rounded object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(image)}
+                    className="w-full rounded border border-red-200 px-2 py-1 text-xs font-medium text-red-700"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={saveReport}
+            disabled={saving || uploadingImages}
+            className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {saving ? "Saving..." : editingId ? "Update Report" : "Publish Report"}
+          </button>
+        </div>
+
+        {statusMessage && <p className="text-sm text-slate-600">{statusMessage}</p>}
+      </section>
+
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4">
+        <h3 className="text-lg font-semibold text-slate-900">Published Reports</h3>
+
+        {reportsLoading && <p className="text-sm text-slate-600">Loading reports...</p>}
+        {reportsError && <p className="text-sm text-red-600">{reportsError}</p>}
+
+        {!reportsLoading && !reportsError && reports.length === 0 && (
+          <p className="text-sm text-slate-500">No reports published yet.</p>
+        )}
+
+        {!reportsLoading && !reportsError && reports.length > 0 && (
+          <div className="space-y-3">
+            {reports.map((report) => (
+              <article key={report.id} className="rounded-xl border border-slate-200 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h4 className="text-base font-semibold text-slate-900">{report.title}</h4>
+                    <p className="text-xs text-slate-500">
+                      {report.authorName || "Unknown publisher"}
+                      {report.authorTitle ? ` (${report.authorTitle})` : ""}
+                      {report.publishedDate ? ` • ${new Date(report.publishedDate).toLocaleDateString("en-KE")}` : ""}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => editReport(report)}
+                      className="rounded border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteReport(report)}
+                      className="rounded border border-red-200 px-3 py-1 text-xs font-medium text-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                <p className="mt-2 line-clamp-3 text-sm text-slate-600">{report.content}</p>
+
+                {report.images.length > 0 && (
+                  <p className="mt-2 text-xs text-slate-500">{report.images.length} image(s)</p>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -203,4 +574,3 @@ function FilterSelect({
 function format(value: number): string {
   return `KES ${value.toLocaleString("en-KE")}`;
 }
-

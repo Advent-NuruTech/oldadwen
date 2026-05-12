@@ -27,11 +27,15 @@ export const metadata: Metadata = {
 
   keywords: [
     "Old SDA Organization",
+    
+    "Old SDA Church",
     "Old Adventism",
     "Historic Adventism",
     "Pioneer Adventist Faith",
     "One True God",
     "Non-Trinitarian",
+    
+    "Restoring Old foundations",
     "Anti-Trinitarian",
     "Trinity rejection",
     "Bible truth movement",
@@ -41,6 +45,8 @@ export const metadata: Metadata = {
     "Adventist reform movement",
     "Health reform",
     "Bible studies",
+    
+    "Maxwel Okoth",
     "Missionary work",
   ],
 
@@ -60,23 +66,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "https://oldsda.org",
-    title: "Old SDA Organization",
+    title: "OLD SEVENTH DAY ADVENTISTS ORGANIZATION",
     description:
       "A Bible-based reform movement restoring pioneer Adventist faith, proclaiming the One True God, rejecting the Trinity, and advancing the Three Angels’ Messages worldwide.",
-    siteName: "Old SDA Organization",
+    siteName: "OLD SEVENTH DAY ADVENTISTS ORGANIZATION",
     images: [
       {
         url: "/images/logo.jpeg",
         width: 1200,
         height: 630,
-        alt: "Old SDA Organization Logo",
+        alt: "OLD SEVENTH DAY ADVENTISTS ORGANIZATION Logo",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Old SDA Organization",
+    title: "OLD SEVENTH DAY ADVENTISTS ORGANIZATION",
     description:
       "Restoring pioneer Adventist faith: One True God, non-Trinitarian belief, and the Three Angels’ Messages.",
     images: ["/images/logo.jpeg"],

@@ -74,7 +74,7 @@ export default function AboutPage() {
     <main
       className="min-h-screen text-white bg-cover bg-center bg-fixed relative pt-28 pb-16 px-4"
       style={{
-        backgroundImage: "url('/images/nature1.jpg')",
+        backgroundImage: "url('/images/background.jpeg')",
       }}
     >
       {/* GLOBAL OVERLAY */}
@@ -102,11 +102,13 @@ export default function AboutPage() {
         <Section
           dark={true}
           title="Our Foundation: A Quest for Truth"
-          image="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop"
+          image="https://res.cloudinary.com/dg7jxs7st/image/upload/v1778401686/WhatsApp_Image_2026-05-05_at_20.20.56_uyrd2t.jpg"
           text={`The Old SDA Organization traces its roots to Amazing Facts Europe Kenya Campus and a deep, prayerful quest for truth.
 
 In 2018, after a powerful convention at Ranen Lwala SDA Church, Ranen Conference, the doctrine of the One True God as taught by the early SDA pioneers was openly presented. This biblical teaching led to the censure of Young Evangelist Ministry by Ranen Conference, marking the beginning of our journey to “contend for the faith which was once delivered unto the saints.” Jude 1:3`}
         />
+
+
 
         <Section
           dark={false}

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, doc, limit, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 
 import { db } from "@/lib/firebase";
-import { FinanceNotificationRecord } from "@/lib/financeTypes";
+import { FinanceNotificationRecord, FinanceNotificationType } from "@/lib/financeTypes";
 
 interface UseFinanceNotificationsOptions {
   limitToUnread?: boolean;
@@ -73,19 +73,30 @@ export function useFinanceNotifications(options: UseFinanceNotificationsOptions 
 function normalizeNotification(value: Record<string, unknown>): FinanceNotificationRecord {
   return {
     id: asText(value.id),
-    transactionId: asText(value.transactionId),
+    transactionId: optionalText(value.transactionId),
+    commentId: optionalText(value.commentId),
+    reportId: optionalText(value.reportId),
     donorName: optionalText(value.donorName),
-    amount: typeof value.amount === "number" ? value.amount : 0,
+    actorName: optionalText(value.actorName),
+    amount: typeof value.amount === "number" ? value.amount : undefined,
     categoryId: optionalText(value.categoryId),
     type: normalizeType(value.type),
+    message: optionalText(value.message),
     status: value.status === "read" ? "read" : "unread",
     createdAt: extractDate(value.createdAt),
     readAt: extractDate(value.readAt),
   };
 }
 
-function normalizeType(value: unknown): "tithe1" | "tithe2" | "offering" | "donation" | "campaign" {
-  if (value === "tithe1" || value === "tithe2" || value === "offering" || value === "donation" || value === "campaign") {
+function normalizeType(value: unknown): FinanceNotificationType {
+  if (
+    value === "tithe1" ||
+    value === "tithe2" ||
+    value === "offering" ||
+    value === "donation" ||
+    value === "campaign" ||
+    value === "report_comment"
+  ) {
     return value;
   }
   return "donation";

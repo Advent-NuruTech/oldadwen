@@ -147,11 +147,11 @@ export default function Navbar() {
                 </button>
 
                 {aboutOpen && (
-                  <div className="absolute top-full mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-fadeIn">
+                  <div className="absolute top-full mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-fadeIn">
                     <Link
                       href="/about"
                       onClick={() => setAboutOpen(false)}
-                      className="block px-4 py-2 text-sm hover:bg-gray-100 transition"
+                      className="block px-4 py-2 text-lg hover:bg-gray-100 transition"
                     >
                       About Us
                     </Link>
@@ -159,10 +159,25 @@ export default function Navbar() {
                     <Link
                       href="/members"
                       onClick={() => setAboutOpen(false)}
-                      className="block px-4 py-2 text-sm hover:bg-gray-100 transition"
+                      className="block px-4 py-2 text-lg hover:bg-gray-100 transition"
                     >
                       Our Team
                     </Link>
+                      <Link
+                      href="/full-time-ministers"
+                      onClick={() => setAboutOpen(false)}
+                      className="block px-4 py-2 text-lg hover:bg-gray-100 transition"
+                    >
+                      Full time Ministers
+                    </Link>
+                    <Link
+                      href="/reports"
+                      onClick={() => setAboutOpen(false)}
+                      className="block px-4 py-2 text-lg hover:bg-gray-100 transition"
+                    >
+                      Reports
+                    </Link>
+                    
                   </div>
                 )}
               </div>

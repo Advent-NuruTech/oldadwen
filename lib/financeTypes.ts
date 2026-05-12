@@ -1,4 +1,5 @@
 ﻿export type FinanceType = "tithe1" | "tithe2" | "offering" | "donation" | "campaign";
+export type FinanceNotificationType = FinanceType | "report_comment";
 export type DonorType = "member" | "visitor";
 export type TransactionStatus = "pending" | "confirmed";
 export type TransactionSource = "online" | "manual";
@@ -101,11 +102,15 @@ export interface PaymentMethodRecord {
 
 export interface FinanceNotificationRecord {
   id: string;
-  transactionId: string;
+  transactionId?: string;
+  commentId?: string;
+  reportId?: string;
   donorName?: string;
-  amount: number;
+  actorName?: string;
+  amount?: number;
   categoryId?: string;
-  type: FinanceType;
+  type: FinanceNotificationType;
+  message?: string;
   status: NotificationStatus;
   createdAt?: Date | null;
   readAt?: Date | null;

@@ -58,6 +58,11 @@ export default function Sidebar({
       icon: FaUsers,
     },
     {
+      href: "/full-time-ministers",
+      label: "Full-Time Ministers",
+      icon: FaUsers,
+    },
+    {
       href: "/sabbath-school",
       label: "Sabbath School",
       icon: FaBookOpen,
@@ -82,6 +87,14 @@ export default function Sidebar({
       label: "Prayer Request",
       icon: FaPrayingHands,
     },
+
+ {
+      href: "/reports",
+      label: "Reports",
+      icon: FaBookOpen,
+    },
+
+
   ];
 
   return (

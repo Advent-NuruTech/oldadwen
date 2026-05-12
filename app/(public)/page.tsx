@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import AboutPreview from "@/components/public/AboutPreview";
+import HomeLatestEvents from "@/components/public/HomeLatestEvents";
 import MaxwellOkothBiography from "@/components/public/MaxwellOkothBiography";
 /* ================= COMPONENTS ================= */
 import Hero from "@/components/public/HeroBanner";
 import BlogList from "@/components/public/BlogList";
-import LibraryList from "@/components/public/LibraryList";
 import { SectionTitle } from "@/components/public/SectionTitle";
 import YoutubeCarousel from "@/components/public/YoutubeCarousel";
 import TrueEducationMessage from "@/components/public/TrueEducationMessage";
@@ -28,6 +28,7 @@ export default function HomePage() {
         {/* ================= HERO ================= */}
         <Hero />
 <AboutPreview />
+<HomeLatestEvents />
     
 <TrueEducationMessage />
    <MaxwellOkothBiography />

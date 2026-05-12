@@ -4,11 +4,13 @@ import { useMemo } from "react";
 import {
   Bell,
   CheckCircle2,
+  MessageSquare,
   CreditCard,
   HandCoins,
 } from "lucide-react";
 
 import { useFinanceNotifications } from "@/hooks/useFinanceNotifications";
+import { FinanceNotificationRecord } from "@/lib/financeTypes";
 
 export default function FinanceNotificationsView() {
   const {
@@ -24,16 +26,19 @@ export default function FinanceNotificationsView() {
     [notifications]
   );
 
-  const getNotificationMessage = (notification: any) => {
-    const donor =
-      notification.donorName?.trim() || "Someone";
+  const getNotificationMessage = (notification: FinanceNotificationRecord) => {
+    if (notification.type === "report_comment") {
+      if (notification.message?.trim()) return notification.message;
+      const actor = notification.actorName?.trim() || notification.donorName?.trim() || "A visitor";
+      return `${actor} sent a new report comment.`;
+    }
 
-    const amount = `KES ${notification.amount.toLocaleString(
-      "en-KE"
-    )}`;
+    const donor = notification.donorName?.trim() || "Someone";
+    const amount = `KES ${(notification.amount ?? 0).toLocaleString("en-KE")}`;
 
     switch (notification.type?.toLowerCase()) {
-      case "tithe":
+      case "tithe1":
+      case "tithe2":
         return `${donor} has successfully paid tithe of ${amount}.`;
 
       case "offering":
@@ -52,6 +57,9 @@ export default function FinanceNotificationsView() {
 
   const getNotificationIcon = (type: string) => {
     switch (type?.toLowerCase()) {
+      case "report_comment":
+        return <MessageSquare className="h-5 w-5" />;
+
       case "payment":
         return <CreditCard className="h-5 w-5" />;
 
@@ -137,7 +145,7 @@ export default function FinanceNotificationsView() {
 
                       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                         <span className="rounded-full bg-slate-100 px-2 py-1 font-medium capitalize text-slate-700">
-                          {notification.type || "Contribution"}
+                          {notification.type === "report_comment" ? "Report Comment" : notification.type || "Contribution"}
                         </span>
 
                         <span>
