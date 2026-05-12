@@ -2,6 +2,7 @@
 
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ReactNode, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -171,10 +172,21 @@ export default function FinancePage() {
 
       <div className="relative max-w-5xl mx-auto space-y-8 z-10">
         <header className="bg-white/10 border border-white/10 backdrop-blur-xl rounded-2xl p-6 sticky top-0 z-40">
-          <h1 className="text-3xl font-bold">
-            Church <span className="text-cyan-400">Finance Portal</span>
-          </h1>
-          <p className="text-slate-300 text-sm mt-2">Transparent giving system for tithes, offerings, and donations.</p>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">
+                Church <span className="text-cyan-400">Finance Portal</span>
+              </h1>
+              <p className="mt-2 text-sm text-slate-300">Transparent giving system for tithes, offerings, and donations.</p>
+            </div>
+
+            <Link
+              href="/admin/finance/login"
+              className="inline-flex items-center rounded-lg border border-cyan-400/60 px-4 py-2 text-sm font-semibold text-cyan-200 hover:bg-cyan-500/10"
+            >
+              Finance Admin Login
+            </Link>
+          </div>
         </header>
 
         {loading && <p className="text-slate-300">Loading...</p>}

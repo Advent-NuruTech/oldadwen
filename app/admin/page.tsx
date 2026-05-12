@@ -1,13 +1,12 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import EditProfile from "@/components/admin/EditProfile";
 import AddAdmin from "@/components/admin/AddAdmin";
-import TrueEducationMessage from "@/components/public/TrueEducationMessage";
 import { signOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import {
   FiUsers,
   FiFileText,
@@ -16,6 +15,7 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 import { FaPrayingHands } from "react-icons/fa";
+import { ReactNode } from "react";
 
 /* ------------------------------------------------------------------ */
 
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
             title="Members"
             value={stats.members}
             icon={<FiUsers />}
-            onClick={() => router.push("/members")}
+            onClick={() => router.push("/admin/members/edit-member")}
             color="blue"
           />
 
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
             title="Blog Posts"
             value={stats.blog}
             icon={<FiFileText />}
-            onClick={() => router.push("/blog")}
+            onClick={() => router.push("/admin/blog/blog-delete")}
             color="emerald"
           />
         </div>
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
                 onClick={() => setActiveTab(null)}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
               >
-                ✕
+                ×
               </button>
             </div>
 
@@ -182,7 +182,14 @@ export default function AdminDashboard() {
 
 /* ================= COMPONENTS ================= */
 
-const statStyles: any = {
+type StatColor = "blue" | "pink" | "emerald";
+
+type StatStyle = {
+  iconBg: string;
+  iconText: string;
+};
+
+const statStyles: Record<StatColor, StatStyle> = {
   blue: {
     iconBg: "bg-blue-100 dark:bg-blue-900/30",
     iconText: "text-blue-600",
@@ -197,7 +204,19 @@ const statStyles: any = {
   },
 };
 
-function StatCard({ title, value, icon, onClick, color }: any) {
+function StatCard({
+  title,
+  value,
+  icon,
+  onClick,
+  color,
+}: {
+  title: string;
+  value: number;
+  icon: ReactNode;
+  onClick: () => void;
+  color: StatColor;
+}) {
   const s = statStyles[color];
 
   return (
@@ -220,7 +239,17 @@ function StatCard({ title, value, icon, onClick, color }: any) {
   );
 }
 
-const toolStyles: any = {
+type ToolColor = "blue" | "emerald";
+
+type ToolStyle = {
+  bg: string;
+  border: string;
+  title: string;
+  text: string;
+  button: string;
+};
+
+const toolStyles: Record<ToolColor, ToolStyle> = {
   blue: {
     bg: "bg-blue-50 dark:bg-blue-900/20",
     border: "border-blue-200 dark:border-blue-800",
@@ -237,7 +266,17 @@ const toolStyles: any = {
   },
 };
 
-function ToolCard({ title, desc, color, onClick }: any) {
+function ToolCard({
+  title,
+  desc,
+  color,
+  onClick,
+}: {
+  title: string;
+  desc: string;
+  color: ToolColor;
+  onClick: () => void;
+}) {
   const s = toolStyles[color];
 
   return (
@@ -253,3 +292,4 @@ function ToolCard({ title, desc, color, onClick }: any) {
     </div>
   );
 }
+

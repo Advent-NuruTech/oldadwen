@@ -1,29 +1,40 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import AdminSidebar from "./AdminSidebar";
 import {
-  FaTachometerAlt,
-  FaUsers,
   FaBookOpen,
   FaCalendarAlt,
   FaDonate,
+  FaFileAlt,
   FaPrayingHands,
+  FaTachometerAlt,
+  FaUsers,
+  FaUserTie,
 } from "react-icons/fa";
+
+import AdminSidebar from "./AdminSidebar";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: FaTachometerAlt },
+
   { href: "/admin/members/add-member", label: "Add Member", icon: FaUsers },
-  { href: "/admin/members/edit-member", label: "Edit Members", icon: FaUsers },
+  { href: "/admin/members/edit-member", label: "Manage Members", icon: FaUsers },
+
+  { href: "/admin/full-time-ministers/add-member", label: "Add Full-Time Minister", icon: FaUserTie },
+  { href: "/admin/full-time-ministers/edit-member", label: "Manage Full-Time Ministers", icon: FaUserTie },
 
   { href: "/admin/sabbath-school/add-lesson", label: "Add Lesson", icon: FaBookOpen },
   { href: "/admin/sabbath-school/edit-lesson", label: "Edit Lessons", icon: FaBookOpen },
 
   { href: "/admin/blog/post", label: "Post Blog", icon: FaBookOpen },
   { href: "/admin/blog/blog-delete", label: "Edit / Delete Blog", icon: FaBookOpen },
+
   { href: "/admin/events", label: "Event Manager", icon: FaCalendarAlt },
-  { href: "/admin/finance", label: "Finance ERP", icon: FaDonate },
+  { href: "/admin/reports", label: "Reports Manager", icon: FaFileAlt },
+
+  { href: "/admin/finance/login", label: "Finance Login", icon: FaDonate },
+  { href: "/admin/finance/login/dashboard", label: "Finance Dashboard", icon: FaDonate },
 
   { href: "/admin/bible-studies", label: "Upload Study Notes", icon: FaBookOpen },
   { href: "/admin/upload-video", label: "Upload Video", icon: FaBookOpen },
@@ -41,8 +52,6 @@ export default function AdminLayout({
 
   return (
     <div className="flex min-h-screen bg-transparent text-inherit">
-
-      {/* SIDEBAR */}
       <AdminSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -52,34 +61,27 @@ export default function AdminLayout({
         }))}
       />
 
-      {/* MAIN AREA */}
-      <div className="flex-1 md:ml-64 flex flex-col">
-
-        {/* MOBILE TOP BAR */}
-        <header className="
-          md:hidden flex items-center justify-between px-4 py-3
-          bg-transparent
-          border-b border-slate-200 dark:border-gray-800
-        ">
+      <div className="flex flex-1 flex-col md:ml-64">
+        <header
+          className="
+            md:hidden flex items-center justify-between px-4 py-3
+            bg-transparent border-b border-slate-200 dark:border-gray-800
+          "
+        >
           <button
             onClick={() => setSidebarOpen(true)}
             className="text-2xl text-inherit"
+            aria-label="Open admin navigation"
           >
             ☰
           </button>
 
-          <h1 className="font-semibold tracking-wide">
-            Admin Panel
-          </h1>
+          <h1 className="font-semibold tracking-wide">Admin Panel</h1>
         </header>
 
-        {/* PAGE CONTENT (NO STYLE OVERRIDES) */}
-        <main className="flex-1 p-0 bg-transparent">
-          <div className="w-full h-full">
-            {children}
-          </div>
+        <main className="flex-1 bg-transparent p-0">
+          <div className="h-full w-full">{children}</div>
         </main>
-
       </div>
     </div>
   );
