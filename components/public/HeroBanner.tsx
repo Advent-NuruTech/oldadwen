@@ -46,10 +46,10 @@ function useTyping(text: string, speed = 90, repeatDelay = 2000) {
 
 /* Professional Background Images */
 const heroImages = [
-  "/images/hero/6.jpeg",
-  "/images/hero/5.jpeg",
-  "/images/hero/8.jpeg",
-  "/images/hero/1.jpeg",
+  "/hero/6.jpeg",
+  "/hero/5.jpeg",
+  "/hero/8.jpeg",
+  "/hero/1.jpeg",
  
 ];
 
