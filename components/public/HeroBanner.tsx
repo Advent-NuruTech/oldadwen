@@ -50,7 +50,6 @@ const heroImages = [
   "/hero/5.jpeg",
   "/hero/8.jpeg",
   "/hero/1.jpeg",
- 
 ];
 
 export default function HeroBanner() {
@@ -108,13 +107,13 @@ export default function HeroBanner() {
 
   return (
     <section className="relative min-h-screen overflow-hidden flex items-center bg-black">
-      {/* BACKGROUND IMAGE SLIDER */}
+      {/* BACKGROUND IMAGE SLIDER - REDUCED OPACITY FOR BETTER VISIBILITY */}
       <AnimatePresence mode="wait">
         <motion.div
           key={heroImages[currentImage]}
           className="absolute inset-0"
           initial={{ opacity: 0, scale: 1.08 }}
-          animate={{ opacity: 1, scale: 1 }}
+          animate={{ opacity: 0.85, scale: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 2 }}
         >
@@ -126,17 +125,19 @@ export default function HeroBanner() {
         </motion.div>
       </AnimatePresence>
 
-      {/* PREMIUM OVERLAYS */}
-      <div className="absolute inset-0 bg-black/60 z-10" />
+      {/* OPTIMIZED OVERLAYS - BALANCED FOR IMAGE VISIBILITY */}
+      {/* Primary dark overlay - reduced opacity */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70 z-10" />
+      
+      {/* Side gradient for depth - reduced intensity */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/10 z-10" />
+      
+      {/* Bottom gradient for text readability - optimized */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10" />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-10" />
-
-      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-[#020617]/50 z-10" />
-
-      {/* LIGHT EFFECT */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-500/20 blur-[140px] rounded-full z-10" />
-
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-cyan-400/10 blur-[120px] rounded-full z-10" />
+      {/* Subtle light effects - reduced intensity */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-500/10 blur-[140px] rounded-full z-10" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-cyan-400/5 blur-[120px] rounded-full z-10" />
 
       {/* CONTENT */}
       <div className="relative z-20 w-full max-w-7xl mx-auto px-5 lg:px-8 py-16">
@@ -148,11 +149,9 @@ export default function HeroBanner() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-black/30 backdrop-blur-md mb-6"
             >
-              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-
-           
+             
             </motion.div>
 
             {/* TITLE */}
@@ -160,10 +159,10 @@ export default function HeroBanner() {
               initial={{ opacity: 0, y: 35 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight text-white"
+              className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight text-white drop-shadow-2xl"
             >
               Old Seventh Day{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-600 drop-shadow-lg">
                 Adventists
               </span>
             </motion.h1>
@@ -173,9 +172,9 @@ export default function HeroBanner() {
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.1 }}
-              className="mt-5 text-xl sm:text-2xl text-blue-100 font-medium leading-relaxed"
+              className="mt-5 text-xl sm:text-2xl text-blue-50 font-medium leading-relaxed drop-shadow-lg"
             >
-              Restoring all things through Practical Biblical truth. Our Fellowship is with the Father and the Son
+              Restoring all things. Our Fellowship is with the Father and the Son
             </motion.h2>
 
             {/* TYPING TEXT */}
@@ -185,7 +184,7 @@ export default function HeroBanner() {
               transition={{ delay: 0.4 }}
               className="mt-6 min-h-[40px]"
             >
-              <p className="text-lg sm:text-xl font-semibold text-cyan-200">
+              <p className="text-lg sm:text-xl font-semibold text-cyan-200 drop-shadow-md">
                 {typingText}
                 <span className="animate-pulse ml-1">|</span>
               </p>
@@ -207,21 +206,21 @@ export default function HeroBanner() {
 
               <Link
                 href="/library"
-                className="rounded-xl border border-white/20 bg-white/5 backdrop-blur-md px-7 py-4 font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:scale-105"
+                className="rounded-xl border border-white/30 bg-black/30 backdrop-blur-md px-7 py-4 font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:scale-105"
               >
                 Bible Studies
               </Link>
 
               <Link
                 href="/calendar"
-                className="rounded-xl border border-cyan-400/30 bg-cyan-400/5 backdrop-blur-md px-7 py-4 font-semibold text-cyan-100 transition-all duration-300 hover:bg-cyan-400/10 hover:scale-105"
+                className="rounded-xl border border-cyan-400/40 bg-black/30 backdrop-blur-md px-7 py-4 font-semibold text-cyan-100 transition-all duration-300 hover:bg-cyan-400/10 hover:scale-105"
               >
                 Calendar
               </Link>
 
               <Link
                 href="/reports"
-                className="rounded-xl border border-blue-400/30 bg-blue-400/5 backdrop-blur-md px-7 py-4 font-semibold text-blue-100 transition-all duration-300 hover:bg-blue-400/10 hover:scale-105"
+                className="rounded-xl border border-blue-400/40 bg-black/30 backdrop-blur-md px-7 py-4 font-semibold text-blue-100 transition-all duration-300 hover:bg-blue-400/10 hover:scale-105"
               >
                 Reports
               </Link>
@@ -244,10 +243,10 @@ export default function HeroBanner() {
           >
             <div className="relative w-full max-w-2xl">
               {/* GLOW */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500/30 to-blue-600/30 blur-2xl rounded-3xl" />
+              <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 blur-2xl rounded-3xl" />
 
               {/* CARD */}
-              <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)]">
+              <div className="relative rounded-3xl overflow-hidden border border-white/20 bg-black/30 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.4)]">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent z-20" />
 
                 <div className="aspect-video relative">
@@ -267,19 +266,19 @@ export default function HeroBanner() {
                     )}
                   </AnimatePresence>
 
-                  {/* OVERLAY */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" />
+                  {/* VIDEO OVERLAY - minimal for better visibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 pointer-events-none" />
                 </div>
 
                 {/* BOTTOM INFO */}
-                <div className="p-5 border-t border-white/10 bg-black/40 backdrop-blur-lg">
+                <div className="p-5 border-t border-white/20 bg-black/40 backdrop-blur-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">
+                      <h3 className="text-white font-semibold text-lg drop-shadow-md">
                         Featured Gospel Messages
                       </h3>
 
-                      <p className="text-blue-100/70 text-sm mt-1">
+                      <p className="text-blue-100/80 text-sm mt-1">
                         Watch sermons, Bible studies, and mission reports.
                       </p>
                     </div>
@@ -291,7 +290,7 @@ export default function HeroBanner() {
                           className={`h-2 rounded-full transition-all duration-500 ${
                             index === currentVideo
                               ? "w-8 bg-cyan-400"
-                              : "w-2 bg-white/30"
+                              : "w-2 bg-white/40"
                           }`}
                         />
                       ))}
@@ -312,9 +311,9 @@ export default function HeroBanner() {
             duration: 1.8,
             repeat: Infinity,
           }}
-          className="w-7 h-12 rounded-full border border-white/30 flex justify-center pt-2 backdrop-blur-md bg-white/5"
+          className="w-7 h-12 rounded-full border border-white/40 flex justify-center pt-2 backdrop-blur-md bg-black/20"
         >
-          <div className="w-1.5 h-3 rounded-full bg-white" />
+          <div className="w-1.5 h-3 rounded-full bg-white/80" />
         </motion.div>
       </div>
     </section>
