@@ -26,7 +26,7 @@ export default function MaxwellOkothBiography() {
 
             {/* HERO IMAGE */}
             <div
-              className="relative h-64 w-full cursor-pointer"
+              className="relative h-94 w-full cursor-pointer"
               onClick={() => setImageView(images.hero)}
             >
               <Image src={images.hero} alt="Ev. Maxwel Okoth Ouma" fill className="object-cover" />

@@ -17,7 +17,7 @@ export default function HomePage() {
     <main
       className="min-h-screen text-white bg-cover bg-center bg-fixed relative"
       style={{
-        backgroundImage: "url('/images/nature1.jpg')",
+        backgroundImage: "url('/images/background.jpeg')",
       }}
     >
       {/* Overlay */}

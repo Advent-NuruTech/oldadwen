@@ -47,7 +47,7 @@ export default function AboutPreview() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-fixed"
         style={{
-          backgroundImage: "url('/images/nature1.jpg')",
+          backgroundImage: "url('/images/background.jpeg')",
         }}
       />
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
