@@ -2,7 +2,6 @@
 
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ReactNode, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -18,15 +17,27 @@ export default function FinancePage() {
   });
 
   const [step, setStep] = useState(1);
+  const totalSteps = 4;
   const [submitting, setSubmitting] = useState(false);
   const [stepError, setStepError] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<FinanceFormSubmitPayload>>({
     donorType: undefined,
+    selectedCategoryIds: [],
+    categoryAmounts: {},
   });
 
-  const selectedCategory = useMemo(
-    () => categories.find((entry) => entry.id === formData.categoryId),
-    [categories, formData.categoryId],
+  const selectedCategories = useMemo(
+    () => categories.filter((entry) => formData.selectedCategoryIds?.includes(entry.id)),
+    [categories, formData.selectedCategoryIds],
+  );
+
+  const totalAmount = useMemo(
+    () =>
+      selectedCategories.reduce((sum, category) => {
+        const amount = formData.categoryAmounts?.[category.id];
+        return sum + (typeof amount === "number" && Number.isFinite(amount) ? amount : 0);
+      }, 0),
+    [selectedCategories, formData.categoryAmounts],
   );
 
   const selectedChurch = useMemo(
@@ -36,19 +47,10 @@ export default function FinancePage() {
 
   const stepLabel = useMemo(() => {
     if (step === 1) return "Welcome";
-    if (step === 2) return "Identity";
+    if (step === 2) return "Donor Type";
     if (step === 3) return "Contribution Form";
-    if (step === 4) return "Amount";
-    if (step === 5) return "Personal Details";
-    // For members only
-    if (step === 6 && formData.donorType === "member") return "Church Details";
     return "Final Review";
-  }, [step, formData.donorType]);
-
-  // Calculate total steps based on donor type
-  const totalSteps = useMemo(() => {
-    return formData.donorType === "visitor" ? 6 : 7;
-  }, [formData.donorType]);
+  }, [step]);
 
   const onFormChange = (patch: Partial<FinanceFormSubmitPayload>) => {
     setStepError(null);
@@ -58,13 +60,23 @@ export default function FinancePage() {
   const canProceedFromStep = (currentStep: number): boolean => {
     if (currentStep !== 3) return true;
 
-    if (!formData.categoryId) {
-      setStepError("Select contribution type to continue.");
+    if (!formData.selectedCategoryIds || formData.selectedCategoryIds.length === 0) {
+      setStepError("Select at least one contribution type to continue.");
       return false;
     }
 
-    if (!formData.amount || formData.amount <= 0) {
-      setStepError("Enter a valid amount to continue.");
+    const hasInvalidAmount = formData.selectedCategoryIds.some((categoryId) => {
+      const amount = formData.categoryAmounts?.[categoryId] || 0;
+      return amount <= 0;
+    });
+
+    if (hasInvalidAmount) {
+      setStepError("Ensure each selected category has a valid amount.");
+      return false;
+    }
+
+    if (formData.donorType === "member" && !formData.churchId) {
+      setStepError("Members should select conference, region, and church before continuing.");
       return false;
     }
 
@@ -75,29 +87,12 @@ export default function FinancePage() {
     setStepError(null);
     if (!canProceedFromStep(step)) return;
 
-    setStep((current) => {
-      // For visitors: skip step 6 (church details)
-      if (formData.donorType === "visitor") {
-        if (current === 5) return 6; // Go directly to final review
-        return Math.min(totalSteps, current + 1);
-      }
-      
-      // For members: normal flow
-      return Math.min(totalSteps, current + 1);
-    });
+    setStep((current) => Math.min(totalSteps, current + 1));
   };
 
   const previousStep = () => {
     setStepError(null);
-    setStep((current) => {
-      // For visitors: no step 6 to worry about
-      if (formData.donorType === "visitor") {
-        return Math.max(1, current - 1);
-      }
-      
-      // For members: normal flow
-      return Math.max(1, current - 1);
-    });
+    setStep((current) => Math.max(1, current - 1));
   };
 
   const chooseDonorType = (donorType: "member" | "visitor") => {
@@ -114,8 +109,23 @@ export default function FinancePage() {
   };
 
   const submitFinal = async () => {
-    if (!formData.donorType || !formData.categoryId || !formData.amount || formData.amount <= 0) {
-      setStepError("Amount and contribution type are required before submit.");
+    if (!formData.donorType || !formData.selectedCategoryIds || formData.selectedCategoryIds.length === 0) {
+      setStepError("Contribution categories are required before submit.");
+      return;
+    }
+
+    const invalidAmount = formData.selectedCategoryIds.some((categoryId) => {
+      const amount = formData.categoryAmounts?.[categoryId] || 0;
+      return amount <= 0;
+    });
+
+    if (invalidAmount) {
+      setStepError("Ensure each selected category has a valid amount.");
+      return;
+    }
+
+    if (formData.donorType === "member" && !formData.churchId) {
+      setStepError("Members should select conference, region, and church before submit.");
       return;
     }
 
@@ -123,37 +133,42 @@ export default function FinancePage() {
     setStepError(null);
 
     try {
-      const payload = {
-        amount: formData.amount,
-        categoryId: formData.categoryId,
-        type: formData.type || selectedCategory?.type || "donation",
-        purpose: formData.purpose || null,
-        // Only include church data for members
-        conferenceId: formData.donorType === "member" ? formData.conferenceId || null : null,
-        regionId: formData.donorType === "member" ? formData.regionId || null : null,
-        churchId: formData.donorType === "member" ? formData.churchId || null : null,
-        donorType: formData.donorType,
-        name: formData.name || null,
-        phone: formData.phone || null,
-        email: formData.email || null,
-        message: formData.message || null,
-        status: "pending",
-        source: "online",
-        createdAt: serverTimestamp(),
-      };
+      const selectedCategories = categories.filter((entry) => formData.selectedCategoryIds?.includes(entry.id));
 
-      const transactionRef = await addDoc(collection(db, "finance_transactions"), payload);
+      const createPromises = selectedCategories.map(async (category) => {
+        const amount = formData.categoryAmounts?.[category.id] || 0;
+        const payload = {
+          amount,
+          categoryId: category.id,
+          type: category.type,
+          purpose: formData.purpose || null,
+          conferenceId: formData.donorType === "member" ? formData.conferenceId || null : null,
+          regionId: formData.donorType === "member" ? formData.regionId || null : null,
+          churchId: formData.donorType === "member" ? formData.churchId || null : null,
+          donorType: formData.donorType,
+          name: formData.name || null,
+          phone: formData.phone || null,
+          email: formData.email || null,
+          message: formData.message || null,
+          status: "pending",
+          source: "online",
+          createdAt: serverTimestamp(),
+        };
 
-      await addDoc(collection(db, "notifications"), {
-        transactionId: transactionRef.id,
-        donorName: payload.name || null,
-        amount: payload.amount,
-        categoryId: payload.categoryId,
-        type: payload.type,
-        status: "unread",
-        createdAt: serverTimestamp(),
+        const transactionRef = await addDoc(collection(db, "finance_transactions"), payload);
+
+        return addDoc(collection(db, "notifications"), {
+          transactionId: transactionRef.id,
+          donorName: payload.name || null,
+          amount: payload.amount,
+          categoryId: payload.categoryId,
+          type: payload.type,
+          status: "unread",
+          createdAt: serverTimestamp(),
+        });
       });
 
+      await Promise.all(createPromises);
       router.push("/finance/success");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "Failed to submit contribution.";
@@ -207,7 +222,9 @@ export default function FinancePage() {
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <Card title="Welcome">
-                  <p className="text-lg text-slate-200">Welcome to the Church Finance System. All contributions are recorded transparently.</p>
+                  <p className="text-lg text-slate-200">
+                    Welcome. Choose one or more categories, enter each amount, and the system will calculate your total automatically.
+                  </p>
                   <Next onClick={nextStep} />
                 </Card>
               )}
@@ -244,61 +261,32 @@ export default function FinancePage() {
               )}
 
               {step === 4 && (
-                <Card title="Confirm Amount">
-                  <p className="text-3xl font-bold text-cyan-400">KES {(formData.amount || 0).toLocaleString("en-KE")}</p>
-                  <div className="flex justify-between mt-6">
-                    <Back onClick={previousStep} />
-                    <Next onClick={nextStep} />
-                  </div>
-                </Card>
-              )}
-
-              {step === 5 && (
-                <Card title="Personal Details">
-                  <div className="space-y-2 text-slate-200">
-                    <p>Name: {formData.name || "-"}</p>
-                    <p>Phone: {formData.phone || "-"}</p>
-                    <p>Email: {formData.email || "-"}</p>
-                    <p>Identity: {formData.donorType === "member" ? "Church Member" : "Visitor"}</p>
-                  </div>
-                  <div className="flex justify-between mt-6">
-                    <Back onClick={previousStep} />
-                    <Next onClick={nextStep} />
-                  </div>
-                </Card>
-              )}
-
-              {/* Church Details - ONLY for members */}
-              {step === 6 && formData.donorType === "member" && (
-                <Card title="Church Details">
-                  <div className="space-y-2 text-slate-200">
-                    <p>Church: {selectedChurch?.name || "Not selected"}</p>
-                  </div>
-                  <div className="flex justify-between mt-6">
-                    <Back onClick={previousStep} />
-                    <Next onClick={nextStep} />
-                  </div>
-                </Card>
-              )}
-
-              {/* Final Review - Different content for visitors vs members */}
-              {step === totalSteps && (
                 <Card title="Final Review">
-                  <div className="space-y-3 text-slate-200 text-sm">
-                    <p>
-                      Confirm the paying of {selectedCategory?.title?.toLowerCase() || "contribution"} of amount KES{" "}
-                      {(formData.amount || 0).toLocaleString("en-KE")} to OLD SDA Organization.
-                    </p>
-                    <p className="font-semibold mt-4">Your details</p>
-                    <p>Name: {formData.name || "-"}</p>
-                    <p>Phone: {formData.phone || "-"}</p>
-                    <p>Email: {formData.email || "-"}</p>
-                    <p>Donor Type: {formData.donorType === "member" ? "Church Member" : "Visitor"}</p>
-                    {/* Only show church for members */}
-                    {formData.donorType === "member" && (
-                      <p>Church: {selectedChurch?.name || "Not selected"}</p>
-                    )}
-                    <p>Amount: KES {(formData.amount || 0).toLocaleString("en-KE")}</p>
+                  <div className="space-y-4 text-slate-200 text-sm">
+                    <div className="rounded-2xl border border-slate-700 bg-slate-900/40 p-4">
+                      <p className="font-semibold text-slate-100">Confirm these contributions</p>
+                      {selectedCategories.map((category) => (
+                        <div key={category.id} className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-slate-800/80 px-3 py-2 text-sm">
+                          <span>{category.title}</span>
+                          <span>
+                            KES {(Number(formData.categoryAmounts?.[category.id] || 0)).toLocaleString("en-KE")}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="mt-4 flex items-center justify-between rounded-xl bg-cyan-900/20 px-3 py-2 text-sm font-semibold text-cyan-100">
+                        <span>Total</span>
+                        <span>KES {totalAmount.toLocaleString("en-KE")}</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="font-semibold">Your details</p>
+                      <p>Name: {formData.name || "-"}</p>
+                      <p>Phone: {formData.phone || "-"}</p>
+                      <p>Email: {formData.email || "-"}</p>
+                      <p>Donor Type: {formData.donorType === "member" ? "Church Member" : "Visitor"}</p>
+                      {formData.donorType === "member" && <p>Church: {selectedChurch?.name || "Not selected"}</p>}
+                    </div>
                   </div>
 
                   <div className="flex justify-between mt-6">

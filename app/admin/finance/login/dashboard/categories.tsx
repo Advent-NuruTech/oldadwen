@@ -1,11 +1,11 @@
 "use client";
 
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { useState } from "react";
+import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 import { useFinanceRealtimeData } from "@/hooks/useFinanceRealtimeData";
 import { db } from "@/lib/firebase";
-import { FinanceType } from "@/lib/financeTypes";
+import { FinanceType, FinanceCategoryRecord } from "@/lib/financeTypes";
 
 const TYPES: FinanceType[] = ["tithe1", "tithe2", "offering", "donation", "campaign"];
 
@@ -18,26 +18,32 @@ export default function FinanceCategoriesView() {
   const [isPublic, setIsPublic] = useState(true);
   const [isActive, setIsActive] = useState(true);
   const [priority, setPriority] = useState(100);
+  const [saving, setSaving] = useState(false);
 
   const addCategory = async () => {
     if (!title.trim()) return;
 
-    await addDoc(collection(db, "finance_categories"), {
-      title: title.trim(),
-      description: description.trim() || null,
-      type,
-      isActive,
-      isPublic,
-      priority,
-      createdAt: serverTimestamp(),
-    });
+    setSaving(true);
+    try {
+      await addDoc(collection(db, "finance_categories"), {
+        title: title.trim(),
+        description: description.trim() || null,
+        type,
+        isActive,
+        isPublic,
+        priority,
+        createdAt: serverTimestamp(),
+      });
 
-    setTitle("");
-    setDescription("");
-    setType("offering");
-    setIsPublic(true);
-    setIsActive(true);
-    setPriority(100);
+      setTitle("");
+      setDescription("");
+      setType("offering");
+      setIsPublic(true);
+      setIsActive(true);
+      setPriority(100);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const patchCategory = async (id: string, patch: Record<string, unknown>) => {
@@ -48,20 +54,36 @@ export default function FinanceCategoriesView() {
     <div className="space-y-5">
       <h2 className="text-2xl font-bold text-slate-900">Finance Categories</h2>
 
-      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-        <h3 className="text-lg font-semibold text-slate-900">Add Category</h3>
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">Add New Category</h3>
+          <p className="text-sm text-slate-600">
+            Create a category here, then use the list below to quickly set Active/Inactive, edit, or delete.
+          </p>
+        </div>
 
         <label className="block text-sm font-medium text-slate-700">
-          <span>Title</span>
-          <input value={title} onChange={(event) => setTitle(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" />
+          <span>Category Name</span>
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="Example: Sabbath Offering"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+          />
         </label>
 
         <label className="block text-sm font-medium text-slate-700">
           <span>Description</span>
-          <textarea value={description} onChange={(event) => setDescription(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" rows={3} />
+          <textarea
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Short note for users (optional)"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            rows={2}
+          />
         </label>
 
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-4">
           <label className="block text-sm font-medium text-slate-700">
             <span>Type</span>
             <select value={type} onChange={(event) => setType(event.target.value as FinanceType)} className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2">
@@ -76,51 +98,166 @@ export default function FinanceCategoriesView() {
             <input type="number" value={priority} onChange={(event) => setPriority(Number(event.target.value) || 100)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" />
           </label>
 
-          <div className="space-y-2 pt-1 text-sm">
-            <label className="flex items-center gap-2"><input type="checkbox" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} /> Active</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} /> Public</label>
+          <div className="space-y-2 pt-6 text-sm">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} />
+              Active
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} />
+              Public
+            </label>
           </div>
         </div>
 
-        <button type="button" onClick={addCategory} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Add Category</button>
+        <button type="button" onClick={addCategory} disabled={saving} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+          {saving ? "Saving..." : "Add New Category"}
+        </button>
       </section>
 
-      {categories.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
-          <h3 className="mb-3 text-lg font-semibold text-slate-900">Category List</h3>
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <article key={category.id} className="rounded-lg border border-slate-200 p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <h4 className="font-semibold text-slate-900">{category.title}</h4>
-                    <p className="text-xs text-slate-500">{category.type} | Priority {category.priority}</p>
-                    {category.description && <p className="text-sm text-slate-600">{category.description}</p>}
-                  </div>
+      <section className="rounded-2xl border border-slate-200 bg-white p-4">
+        <h3 className="mb-1 text-lg font-semibold text-slate-900">Existing Categories</h3>
+        <p className="mb-4 text-sm text-slate-600">Use Active checkbox to enable, uncheck to set inactive. Edit and Delete are beside each category.</p>
 
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => patchCategory(category.id, { isActive: !category.isActive })}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${category.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"}`}
-                    >
-                      {category.isActive ? "Active" : "Inactive"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => patchCategory(category.id, { isPublic: !category.isPublic })}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${category.isPublic ? "bg-blue-100 text-blue-700" : "bg-slate-200 text-slate-700"}`}
-                    >
-                      {category.isPublic ? "Public" : "Internal"}
-                    </button>
-                  </div>
-                </div>
-              </article>
+        {categories.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
+            No categories yet. Add your first category above.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {categories.map((category) => (
+              <CategoryItem key={category.id} category={category} onSave={patchCategory} />
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
     </div>
   );
 }
 
+function CategoryItem({
+  category,
+  onSave,
+}: {
+  category: FinanceCategoryRecord;
+  onSave: (id: string, patch: Record<string, unknown>) => Promise<void>;
+}) {
+  const [title, setTitle] = useState(category.title);
+  const [description, setDescription] = useState(category.description || "");
+  const [type, setType] = useState<FinanceType>(category.type);
+  const [priority, setPriority] = useState(category.priority);
+  const [isActive, setIsActive] = useState(category.isActive);
+  const [isPublic, setIsPublic] = useState(category.isPublic);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setTitle(category.title);
+    setDescription(category.description || "");
+    setType(category.type);
+    setPriority(category.priority);
+    setIsActive(category.isActive);
+    setIsPublic(category.isPublic);
+  }, [category]);
+
+  const saveChanges = async () => {
+    setSaving(true);
+    try {
+      await onSave(category.id, {
+        title: title.trim() || category.title,
+        description: description.trim() || null,
+        type,
+        priority,
+        isActive,
+        isPublic,
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteCategory = async () => {
+    if (!window.confirm(`Delete category "${category.title}"? This cannot be undone.`)) {
+      return;
+    }
+
+    await deleteDoc(doc(db, "finance_categories", category.id));
+  };
+
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <div className="grid gap-3 lg:grid-cols-[1.5fr_1fr_120px_120px_auto]">
+        <label className="block text-sm font-medium text-slate-700">
+          <span>Category Name</span>
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+          />
+        </label>
+
+        <label className="block text-sm font-medium text-slate-700">
+          <span>Type</span>
+          <select value={type} onChange={(event) => setType(event.target.value as FinanceType)} className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2">
+            {TYPES.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block text-sm font-medium text-slate-700">
+          <span>Priority</span>
+          <input
+            type="number"
+            value={priority}
+            onChange={(event) => setPriority(Number(event.target.value) || 100)}
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+          />
+        </label>
+
+        <div className="pt-6 text-sm">
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} className="h-4 w-4" />
+            Active
+          </label>
+          <label className="mt-2 flex items-center gap-2">
+            <input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} className="h-4 w-4" />
+            Public
+          </label>
+        </div>
+
+        <div className="flex items-end gap-2 pt-6">
+          <button
+            type="button"
+            onClick={saveChanges}
+            disabled={saving}
+            className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {saving ? "Saving..." : "Save Edit"}
+          </button>
+          <button
+            type="button"
+            onClick={deleteCategory}
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <label className="mt-3 block text-sm font-medium text-slate-700">
+        <span>Description</span>
+        <textarea
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+          rows={2}
+        />
+      </label>
+      <div className="mt-3">
+        <span className="rounded-full bg-slate-200 px-2 py-1 text-xs uppercase tracking-wide text-slate-600">
+          ID: {category.id}
+        </span>
+      </div>
+    </article>
+  );
+}
