@@ -146,14 +146,16 @@ export default function Footer() {
           </p>
 
           {/* TYPING POWERED BY */}
-          <a
-            href="https://adventnurutech.xyz"
-            target="_blank"
-            className="text-blue-400 font-semibold"
-          >
-            {typing}
-            <span className="animate-pulse ml-1">|</span>
-          </a>
+         
+<a
+  href="https://wa.me/254142225233?text=Hello%20Advent%20NuruTech%2C%20I%20came%20across%20your%20work%20through%20the%20Old%20SDA%20Church%20website.%20I%27m%20interested%20in%20your%20services%20and%20would%20like%20to%20learn%20more%20about%20how%20you%20can%20help%20me.%20Thank%20you."
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-blue-400 font-semibold"
+>
+  {typing}
+  <span className="animate-pulse ml-1">|</span>
+</a>
         </div>
       </div>
 

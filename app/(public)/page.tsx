@@ -50,7 +50,8 @@ export default function HomePage() {
             {/* 🔥 ONLY BUTTON KEPT ORIGINAL (UNCHANGED AS REQUESTED) */}
             <div className="mt-10">
               <a
-                href="https://youtube.com/@gospelsounders"
+                href="https://www.youtube.com/@OLDSDATV"
+                
                 target="_blank"
                 className="inline-block bg-white text-[#0F172A] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
               >
