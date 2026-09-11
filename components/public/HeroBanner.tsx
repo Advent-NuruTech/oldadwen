@@ -198,31 +198,15 @@ export default function HeroBanner() {
               className="mt-10 flex flex-wrap gap-4"
             >
               <Link
-                href="/about"
-                className="group relative overflow-hidden rounded-xl bg-blue-600 px-9 py-4 font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-blue-500"
-              >
-                <span className="relative z-10">Who we are </span>
-              </Link>
-
-              
-
-              <Link
                 href="/events"
-                className="rounded-xl border border-cyan-400/40 bg-black/30 backdrop-blur-md px-7 py-4 font-semibold text-cyan-100 transition-all duration-300 hover:bg-cyan-400/10 hover:scale-105"
+                className="rounded-2xl bg-brand-blue px-9 py-4 font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-brand-blue-hover"
               >
-                Latest Events
+                Events
               </Link>
 
               <Link
-                href="/reports"
-                className="rounded-xl border border-blue-400/40 bg-black/30 backdrop-blur-md px-7 py-4 font-semibold text-blue-100 transition-all duration-300 hover:bg-blue-400/10 hover:scale-105"
-              >
-                Reports
-              </Link>
-
-              <Link
-                href="/finance"
-                className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-7 py-4 font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105"
+                href="/donate"
+                className="rounded-2xl border border-brand-blue bg-black/35 px-9 py-4 font-semibold text-white shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-brand-blue"
               >
                 Donate
               </Link>
